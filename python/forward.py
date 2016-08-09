@@ -3,6 +3,7 @@ import caffe
 import h5py
 import os
 import sys
+import time
 
 import setproctitle
 setproctitle.setproctitle(os.path.basename(os.getcwd()))
@@ -43,14 +44,18 @@ for idx, dataset in enumerate(dp.datasets):
         start = time.time()
         # Set inputs.
         for k, v in ins.iteritems():
-            net.blobs[k].reshape((1,) + v.shape)
+            shape = (1,) + v.shape
+            net.blobs[k].reshape(*shape)
             net.blobs[k].data[...] = v
         # Run forward pass.
         net.forward()
         # Extract output data.
         outs = dict()
-        for k, v in scan_spec.iteritems():
+        for k in scan_spec.iterkeys():
             outs[k] = net.blobs[k].data
+            shape = outs[k].shape
+            outs[k].reshape(shape[-4:])
+
         fs.push(outs)    # Push current outputs.
         ins = fs.pull()  # Fetch next inputs.
         # Elapsed time.
