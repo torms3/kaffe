@@ -53,9 +53,6 @@ for idx, dataset in enumerate(dp.datasets):
         outs = dict()
         for k in scan_spec.iterkeys():
             outs[k] = net.blobs[k].data
-            shape = outs[k].shape
-            outs[k].reshape(shape[-4:])
-
         fs.push(outs)    # Push current outputs.
         ins = fs.pull()  # Fetch next inputs.
         # Elapsed time.
