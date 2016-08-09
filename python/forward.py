@@ -33,12 +33,13 @@ dp = VolumeDataProvider(dspec_path, net_spec, dp_params)
 
 # Forward scan.
 scan_spec   = eval(config.get('forward','scan_spec'))
+scan_params = eval(config.get('forward','scan_params'))
 save_prefix = config.get('forward','save_prefix')
 for idx, dataset in enumerate(dp.datasets):
     print 'Forward scan dataset{}'.format(idx)
 
     # Scan loop.
-    fs  = ForwardScanner(dataset, scan_spec)
+    fs  = ForwardScanner(dataset, scan_spec, params=scan_params)
     ins = fs.pull()  # Fetch initial inputs.
     while ins is not None:
         start = time.time()
@@ -46,17 +47,17 @@ for idx, dataset in enumerate(dp.datasets):
         for k, v in ins.iteritems():
             shape = (1,) + v.shape
             net.blobs[k].reshape(*shape)
-            net.blobs[k].data[...] = v
+            net.blobs[k].data[0,...] = v
         # Run forward pass.
         net.forward()
+        # Elapsed time.
+        print 'Elapsed: {}'.format(time.time() - start)
         # Extract output data.
         outs = dict()
         for k in scan_spec.iterkeys():
             outs[k] = net.blobs[k].data
         fs.push(outs)    # Push current outputs.
         ins = fs.pull()  # Fetch next inputs.
-        # Elapsed time.
-        print 'Elapsed: {}'.format(time.time() - start)
 
     # Save as file.
     for name, data in fs.outputs.iteritems():
