@@ -55,7 +55,7 @@ for idx, dataset in enumerate(dp.datasets):
         # Extract output data.
         outs = dict()
         for k in scan_spec.iterkeys():
-            outs[k] = net.blobs[k].data
+            outs[k] = net.blobs[k].data[0,...]
         fs.push(outs)    # Push current outputs.
         ins = fs.pull()  # Fetch next inputs.
 
