@@ -1,6 +1,7 @@
 import ConfigParser
 import caffe
 import h5py
+import os
 import sys
 
 import setproctitle
@@ -25,12 +26,12 @@ net = caffe.Net(model, weights, caffe.TEST)
 
 # Create VolumeDataProvider.
 dspec_path = config.get('forward','data_spec')
-net_spec   = config.get('forward','net_spec')
-dp_params  = config.get('forward','dp_params')
+net_spec   = eval(config.get('forward','net_spec'))
+dp_params  = eval(config.get('forward','dp_params'))
 dp = VolumeDataProvider(dspec_path, net_spec, dp_params)
 
 # Forward scan.
-scan_spec   = config.get('forward','scan_spec')
+scan_spec   = eval(config.get('forward','scan_spec'))
 save_prefix = config.get('forward','save_prefix')
 for idx, dataset in enumerate(dp.datasets):
     print 'Forward scan dataset{}'.format(idx)
@@ -41,7 +42,9 @@ for idx, dataset in enumerate(dp.datasets):
     while ins is not None:
         start = time.time()
         # Set inputs.
-        # TODO(kisuk): VolumeDataLayer?
+        for k, v in ins.iteritems():
+            net.blobs[k].reshape((1,) + v.shape)
+            net.blobs[k].data[...] = v
         # Run forward pass.
         net.forward()
         # Extract output data.

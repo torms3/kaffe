@@ -29,9 +29,12 @@ prefix = eval(config.get('solver','snapshot_prefix'))
 last_iter = 0
 if len(sys.argv) > 3:
     last_iter = int(sys.argv[3])
+    # Solver state.
+    fname = '{}_iter_{}.solverstate.h5'.format(prefix, last_iter)
+    solver.restore(fname)
     # Snapshot.
-    fname = '{}_iter_{}.caffemodel.h5'.format(prefix, last_iter)
-    solver.net.copy_from(fname)
+    # fname = '{}_iter_{}.caffemodel.h5'.format(prefix, last_iter)
+    # solver.net.copy_from(fname)
     # Stats.
     fname = '{}_iter_{}.statistics.h5'.format(prefix, last_iter)
     monitor.load(fname)
