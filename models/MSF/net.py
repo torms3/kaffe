@@ -78,7 +78,7 @@ def multiscale_filter(outsz, phase):
     # Data layers.
     assert phase in ['train','val','deploy']
     if phase == 'deploy':
-        n['input'] = L.Input(shape=dict(dim=v))
+        n['input'] = L.Input(shape=dict(dim=spec['input']))
     else:
         for k, v in spec.iteritems():
             n[k] = L.Input(shape=dict(dim=v))
