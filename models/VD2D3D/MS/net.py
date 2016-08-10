@@ -1,10 +1,14 @@
 #!/usr/bin/env python
 __doc__ = """
 
-VD2D3D-P1: Very Deep 2D-3D ConvNet with one downsampling layer.
+VD2D3D-MS: Very Deep Multiscale 2D-3D ConvNet.
 
 Kisuk Lee <kisuklee@mit.edu>, 2016
 """
+
+import caffe
+from caffe import layers as L, params as P
+from collections import OrderedDict
 
 def conv_relu(bottom, nout, ks, lr_mult, d=1, s=1, share=None):
     """Create convolution layer w/ ReLU activation."""

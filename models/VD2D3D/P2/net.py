@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 __doc__ = """
 
-VD2D3D-P1: Very Deep 2D-3D ConvNet with one downsampling layer.
+VD2D3D-P2: Very Deep 2D-3D ConvNet with two downsampling layers.
 
 Kisuk Lee <kisuklee@mit.edu>, 2016
 """
