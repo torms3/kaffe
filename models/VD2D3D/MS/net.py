@@ -141,7 +141,7 @@ def vd2d3d(outsz, phase):
     offset = [int(x-y)/2 for x,y in zip(fov,fov_p1)]
     size   = [int(x-2*y) for x,y in zip(fov,offset)]
     n.ref_p1  = L.DummyData(shape=dict(dim=size))
-    n.data_p1 = L.Crop(net['input'], n.ref_p1, offset=offset))
+    n.data_p1 = L.Crop(net['input'], n.ref_p1, offset=offset)
 
     # P1 branch.
     n.conv1a_p1, n.relu1a_p1 = conv_relu(n.data_p1,   24, [1,3,3], lr_mult, share="conv1a")
