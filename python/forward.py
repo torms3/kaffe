@@ -5,9 +5,6 @@ import os
 import sys
 import time
 
-import setproctitle
-setproctitle.setproctitle(os.path.basename(os.getcwd()))
-
 import parser
 from data_provider.python.data_provider import VolumeDataProvider
 from data_provider.python.forward import ForwardScanner

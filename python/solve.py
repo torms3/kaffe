@@ -4,9 +4,6 @@ import os
 import sys
 import time
 
-import setproctitle
-setproctitle.setproctitle(os.path.basename(os.getcwd()))
-
 import parser
 import score
 import stats
@@ -50,6 +47,14 @@ start = time.time()
 # Training loop.
 max_iter = config.getint('solver','max_iter')
 for i in range(last_iter+1,max_iter+1):
+
+    # Set inputs.
+    sample = dp.random_sample()
+    for k, v in sample.iteritems():
+        # Assume a sole example in minibatch (single output patch).
+        shape = (1,) + v.shape
+        net.blobs[k].reshape(*shape)
+        net.blobs[k].data[0,...] = v
 
     # Run forward & backward passes.
     solver.step(1)
