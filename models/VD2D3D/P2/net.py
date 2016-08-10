@@ -6,6 +6,10 @@ VD2D3D-P2: Very Deep 2D-3D ConvNet with two downsampling layers.
 Kisuk Lee <kisuklee@mit.edu>, 2016
 """
 
+import caffe
+from caffe import layers as L, params as P
+from collections import OrderedDict
+
 def conv_relu(bottom, nout, ks, lr_mult, d=1, s=1):
     """Create convolution layer w/ ReLU activation."""
     conv = L.Convolution(bottom,
