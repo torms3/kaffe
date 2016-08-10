@@ -18,7 +18,6 @@ def msf(net, lnum, bottom, nout, ks, dilations, lr_mult):
         lnum: Layer number.
         nout: Number of convolution groups.
     """
-    assert nout==len(dilations)
     # Lambda function for computing crop offset.
     offset = lambda ks, ds, rs: [int((k-1)*(r-d))/2 for k,d,r in zip(ks,ds,rs)]
     # Make sure that the list of dilation factors is in increasing order.
