@@ -112,7 +112,7 @@ def multiscale_filter(outsz, phase):
 
     # Loss layer.
     if phase == 'deploy':
-        n.output, _ = conv_relu(n.output, 3, [1,1,1], lr_mult)
+        n.output, _ = conv_relu(n.relux, 3, [1,1,1], lr_mult)
         n.sigmoid = L.Sigmoid(n.output, in_place=True)
     else:
         n.drop = L.Dropout(n.relux, in_place=True)
