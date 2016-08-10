@@ -47,9 +47,7 @@ def msf(net, lnum, bottom, nout, ks, dilations, lr_mult):
 
 
 def conv_relu(bottom, nout, ks, lr_mult, d=1, s=1):
-    """
-    Create convolution layer w/ ReLU activation.
-    """
+    """Create convolution layer w/ ReLU activation."""
     conv = L.Convolution(bottom,
         num_output=nout, kernel_size=ks, dilation=d, stride=s,
         weight_filler=dict(type="msra"), bias_filler=dict(type="constant"),
@@ -58,9 +56,7 @@ def conv_relu(bottom, nout, ks, lr_mult, d=1, s=1):
 
 
 def net_spec(outsz):
-    """
-    Create net specification given outsz.
-    """
+    """Create net specification given outsz."""
     fov     = [9,97,97]
     insz    = [x + y - 1 for x, y in zip(outsz,fov)]
     in_dim  = [1,1] + insz
@@ -70,9 +66,9 @@ def net_spec(outsz):
 
 
 def multiscale_filter(outsz, phase):
-    n = caffe.NetSpec()
 
     # Net specification.
+    n    = caffe.NetSpec()
     spec = net_spec(outsz)
 
     # Data layers.
@@ -113,13 +109,15 @@ def multiscale_filter(outsz, phase):
 
     # Classification layer.
     n.convx, n.relux = conv_relu(n.relu12, 200, [1,1,1], lr_mult)
-    n.drop = L.Dropout(n.relux, in_place=True)
-    n.output, _ = conv_relu(n.drop, 3, [1,1,1], lr_mult)
 
-    # Loss layer
+    # Loss layer.
     if phase == 'deploy':
+        n.output, _ = conv_relu(n.output, 3, [1,1,1], lr_mult)
         n.sigmoid = L.Sigmoid(n.output, in_place=True)
     else:
+        n.drop = L.Dropout(n.relux, in_place=True)
+        n.output, _ = conv_relu(n.drop, 3, [1,1,1], lr_mult)
+        # Custom python loss layer.
         pylayer = 'SigmoidCrossEntropyLossLayer'
         bottoms = [n.output, n['label'], n['label_mask']]
         n.loss, n.loss2, n.cerr = L.Python(*bottoms,
