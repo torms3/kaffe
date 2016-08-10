@@ -20,7 +20,7 @@ train_cfg = ConfigParser.ConfigParser()
 train_cfg.read(sys.argv[2])
 
 # Create solver.
-fname  = train_cfg.get('train','solver_path')
+fname  = train_cfg.get('train','solver')
 config = parser.SolverParser().parse(fname)
 solver = caffe.SGDSolver(fname)
 
@@ -47,8 +47,8 @@ net = solver.net
 # Data provider.
 dp = dict()
 # Common params.
-dspec_path = train_cfg.get('train','dspec_spec')
-net_spec = train_cfg.get('train','data_spec')
+dspec_path = train_cfg.get('train','dspec_path')
+net_spec = eval(train_cfg.get('train','net_spec'))
 # Create train data provider.
 params = dict()
 params['border']  = eval(train_cfg.get('train','border_func'))
@@ -60,9 +60,10 @@ params = dict()
 params['drange'] = eval(train_cfg.get('train','test_range'))
 dp['test'] = VolumeDataProvider(dspec_path, net_spec, params)
 
-# Test loop parms.
-test_iter     = train_cfg.get('train','test_iter')
-test_interval = train_cfg.get('train','test_interval')
+# Test & test loop parms.
+display       = config.getint('solver','display')
+test_iter     = train_cfg.getint('train','test_iter')
+test_interval = train_cfg.getint('train','test_interval')
 
 print 'Start training...'
 print 'Start from ', last_iter + 1
@@ -97,7 +98,6 @@ for i in range(last_iter+1,max_iter+1):
     start = time.time()
 
     # Display.
-    display = config.getint('solver','display')
     if i % display == 0:
         # Normalize.
         elapsed = total_time/display
@@ -106,7 +106,7 @@ for i in range(last_iter+1,max_iter+1):
         # Bookkeeping.
         monitor.append_train(i, stats)
         # Display.
-        base_lr = config.get('solver','base_lr')
+        base_lr = config.getfloat('solver','base_lr')
         print 'Iteration %7d, loss: %.3f, cerr: %.3f,'      \
               'learning rate: %.6f, elapsed: %.3f s/iter'   \
                 % (i, stats['loss'], stats['cerr'], base_lr, elapsed)

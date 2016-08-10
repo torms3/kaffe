@@ -54,5 +54,5 @@ def test_net(iter, solver, test_iter, dp, monitor):
     # Bookkeeping.
     monitor.append_test(iter, stats)
     # Display.
-    print = '[test] Iteration %d, loss: %.3f, cerr: %.3f, elapsed: %.3f s/iter'\
-                    % (iter, stats['loss'], stats['cerr'], elapsed)
+    print '[test] Iteration %d, loss: %.3f, cerr: %.3f, elapsed: %.3f s/iter'\
+          % (iter, stats['loss'], stats['cerr'], elapsed)
