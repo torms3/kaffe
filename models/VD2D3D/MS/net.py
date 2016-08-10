@@ -35,7 +35,7 @@ def net_spec(outsz):
     return OrderedDict(sorted(spec.items(), key=lambda x: x[0])), fov
 
 
-def vd2d3d(outsz):
+def vd2d3d(outsz, phase):
 
     # Net specification.
     n = caffe.NetSpec()
