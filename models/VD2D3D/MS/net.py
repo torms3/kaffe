@@ -179,7 +179,7 @@ def vd2d3d(outsz, phase):
         n.output, _ = conv_relu(n.relux, 3, [1,1,1], lr_mult)
         n.sigmoid = L.Sigmoid(n.output, in_place=True)
     else:
-        n.dropx = L.Dropout(n.relu5b)
+        n.dropx = L.Dropout(n.relux)
         n.output, _ = conv_relu(n.dropx, 3, [1,1,1], lr_mult)
         # Custom python loss layer.
         pylayer = 'SigmoidCrossEntropyLossLayer'
