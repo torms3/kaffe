@@ -10,7 +10,7 @@ import caffe
 import numpy as np
 import time
 
-def test_net(iter, solver, config, monitor):
+def test_net(iter, solver, test_iter, dp, monitor):
 
     # Test net.
     solver.test_nets[0].share_with(solver.net)
@@ -19,13 +19,20 @@ def test_net(iter, solver, config, monitor):
     # Monitoring.
     stats = dict(loss=0.0, cerr=0.0, nmsk=0.0)
 
-    # Timing
+    # Timing.
     start = time.time()
     total_time = 0.0
 
-    # Test loop
-    test_iter = config.getint('solver','test_iter')
+    # Test loop.
     for i in range(1,test_iter+1):
+
+        # Set inputs.
+        sample = dp.random_sample()
+        for k, v in sample.iteritems():
+            # Assume a sole example in minibatch (single output patch).
+            shape = (1,) + v.shape
+            net.blobs[k].reshape(*shape)
+            net.blobs[k].data[0,...] = v
 
         # Run forward pass.
         net.forward()
