@@ -56,13 +56,16 @@ def vd2d3d(outsz, phase):
     # Patch averaging.
     lr_mult = 1.0/(outsz[0]*outsz[1]*outsz[2])
 
+    # Input size.
+    insz = spec['input'][-3:]
+
     """
     P3 path.
     """
     # Crop input.
     fov_p3 = [5,109,109]
     offset = [int(x-y)/2 for x,y in zip(fov,fov_p3)]
-    size   = [int(x-2*y) for x,y in zip(fov,offset)]
+    size   = [int(x-2*y) for x,y in zip(insz,offset)]
     n.ref_p3  = L.DummyData(shape=dict(dim=[1,1]+size))
     n.data_p3 = L.Crop(n['input'], n.ref_p3, offset=offset)
 
@@ -102,7 +105,7 @@ def vd2d3d(outsz, phase):
     # Crop input.
     fov_p2 = [7,73,73]
     offset = [int(x-y)/2 for x,y in zip(fov,fov_p2)]
-    size   = [int(x-2*y) for x,y in zip(fov,offset)]
+    size   = [int(x-2*y) for x,y in zip(insz,offset)]
     n.ref_p2  = L.DummyData(shape=dict(dim=[1,1]+size))
     n.data_p2 = L.Crop(n['input'], n.ref_p2, offset=offset)
 
@@ -139,7 +142,7 @@ def vd2d3d(outsz, phase):
     # Crop input.
     fov_p1 = [9,45,45]
     offset = [int(x-y)/2 for x,y in zip(fov,fov_p1)]
-    size   = [int(x-2*y) for x,y in zip(fov,offset)]
+    size   = [int(x-2*y) for x,y in zip(insz,offset)]
     n.ref_p1  = L.DummyData(shape=dict(dim=[1,1]+size))
     n.data_p1 = L.Crop(n['input'], n.ref_p1, offset=offset)
 
