@@ -63,8 +63,8 @@ def vd2d3d(outsz, phase):
     fov_p3 = [5,109,109]
     offset = [int(x-y)/2 for x,y in zip(fov,fov_p3)]
     size   = [int(x-2*y) for x,y in zip(fov,offset)]
-    net.ref_p3  = L.DummyData(shape=dict(dim=size))
-    net.data_p3 = L.Crop(net['input'], net.ref_p3, offset=offset))
+    n.ref_p3  = L.DummyData(shape=dict(dim=size))
+    n.data_p3 = L.Crop(net['input'], n.ref_p3, offset=offset))
 
     # P3 branch.
     n.conv1a_p3, n.relu1a_p3 = conv_relu(n.data_p3,   24, [1,3,3], lr_mult, share="conv1a")
@@ -103,8 +103,8 @@ def vd2d3d(outsz, phase):
     fov_p2 = [7,73,73]
     offset = [int(x-y)/2 for x,y in zip(fov,fov_p2)]
     size   = [int(x-2*y) for x,y in zip(fov,offset)]
-    net.ref_p2  = L.DummyData(shape=dict(dim=size))
-    net.data_p2 = L.Crop(net['input'], net.ref_p2, offset=offset))
+    n.ref_p2  = L.DummyData(shape=dict(dim=size))
+    n.data_p2 = L.Crop(net['input'], n.ref_p2, offset=offset))
 
     # P2 branch.
     n.conv1a_p2, n.relu1a_p2 = conv_relu(n.data_p2,   24, [1,3,3], lr_mult, share="conv1a")
@@ -140,8 +140,8 @@ def vd2d3d(outsz, phase):
     fov_p1 = [9,45,45]
     offset = [int(x-y)/2 for x,y in zip(fov,fov_p1)]
     size   = [int(x-2*y) for x,y in zip(fov,offset)]
-    net.ref_p1  = L.DummyData(shape=dict(dim=size))
-    net.data_p1 = L.Crop(net['input'], net.ref_p1, offset=offset))
+    n.ref_p1  = L.DummyData(shape=dict(dim=size))
+    n.data_p1 = L.Crop(net['input'], n.ref_p1, offset=offset))
 
     # P1 branch.
     n.conv1a_p1, n.relu1a_p1 = conv_relu(n.data_p1,   24, [1,3,3], lr_mult, share="conv1a")
