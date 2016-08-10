@@ -68,7 +68,7 @@ def net_spec(outsz):
 def multiscale_filter(outsz, phase):
 
     # Net specification.
-    n    = caffe.NetSpec()
+    n = caffe.NetSpec()
     spec = net_spec(outsz)
 
     # Data layers.

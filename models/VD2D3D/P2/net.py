@@ -6,10 +6,6 @@ VD2D3D-P1: Very Deep 2D-3D ConvNet with one downsampling layer.
 Kisuk Lee <kisuklee@mit.edu>, 2016
 """
 
-import caffe
-from caffe import layers as L, params as P
-from collections import OrderedDict
-
 def conv_relu(bottom, nout, ks, lr_mult, d=1, s=1):
     """Create convolution layer w/ ReLU activation."""
     conv = L.Convolution(bottom,
@@ -26,7 +22,7 @@ def max_pool(bottom, ks, d=1, s=1):
 
 def net_spec(outsz):
     """Create net specification given outsz."""
-    fov     = [9,45,45]
+    fov     = [7,73,73]
     insz    = [x + y - 1 for x, y in zip(outsz,fov)]
     in_dim  = [1,1] + insz
     out_dim = [1,3] + outsz
@@ -34,7 +30,7 @@ def net_spec(outsz):
     return OrderedDict(sorted(spec.items(), key=lambda x: x[0]))
 
 
-def vd2d3d(outsz, phase):
+def vd2d3d(outsz):
 
     # Net specification.
     n = caffe.NetSpec()
@@ -64,8 +60,11 @@ def vd2d3d(outsz, phase):
     n.conv2b, n.relu2b = conv_relu(n.relu2a, 36, [1,3,3], lr_mult, d=d)
     n.pool2 = max_pool(n.relu2b, [1,2,2], d=d)
 
-    n.conv3a, n.relu3a = conv_relu(n.pool2,  36, [2,3,3], lr_mult, d=d)
-    n.conv3b, n.relu3b = conv_relu(n.relu3a, 36, [2,3,3], lr_mult, d=d)
+    # Anisotropic dilation.
+    d = [1,4,4]
+
+    n.conv3a, n.relu3a = conv_relu(n.pool2,  48, [1,3,3], lr_mult, d=d)
+    n.conv3b, n.relu3b = conv_relu(n.relu3a, 48, [1,3,3], lr_mult, d=d)
     n.pool3 = max_pool(n.relu3b, [2,2,2], d=d)
 
     n.conv4a, n.relu4a = conv_relu(n.pool3,  60, [2,3,3], lr_mult, d=d)
