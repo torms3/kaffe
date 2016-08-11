@@ -10,7 +10,10 @@ import caffe
 import numpy as np
 import time
 
-def test_net(iter, solver, test_iter, dp, monitor):
+def test_net(iter, solver, test_iter, dp, monitor=None):
+    """
+    Run test loop.
+    """
 
     # Test net.
     solver.test_nets[0].share_with(solver.net)
@@ -52,7 +55,8 @@ def test_net(iter, solver, test_iter, dp, monitor):
     stats['loss'] /= stats['nmsk']
     stats['cerr'] /= stats['nmsk']
     # Bookkeeping.
-    monitor.append_test(iter, stats)
+    if monitor is not None:
+        monitor.append_test(iter, stats)
     # Display.
     print '[test] Iteration %d, loss: %.3f, cerr: %.3f, elapsed: %.3f s/iter'\
           % (iter, stats['loss'], stats['cerr'], elapsed)

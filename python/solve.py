@@ -107,7 +107,7 @@ for i in range(last_iter+1,max_iter+1):
         monitor.append_train(i, stats)
         # Display.
         base_lr = config.getfloat('solver','base_lr')
-        print 'Iteration %7d, loss: %.3f, cerr: %.3f,'      \
+        print 'Iteration %7d, loss: %.3f, cerr: %.3f, '     \
               'learning rate: %.6f, elapsed: %.3f s/iter'   \
                 % (i, stats['loss'], stats['cerr'], base_lr, elapsed)
         # Reset.
