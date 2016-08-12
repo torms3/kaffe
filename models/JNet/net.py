@@ -13,25 +13,25 @@ from caffe import layers as L, params as P
 from collections import OrderedDict
 
 nfeatures = [
-	[1, 24,28,32,48, 64],
-	[0, 12,24,28,32, 48],
-	[0, 0, 12,24,28, 32],
-	[0, 0, 0, 12,24, 28],
-	[0, 0, 0, 0, 12, 24],
-	[0, 0, 0, 0,  0,  3],
+    [1, 24,28,32,48, 64],
+    [0, 12,24,28,32, 48],
+    [0, 0, 12,24,28, 32],
+    [0, 0, 0, 12,24, 28],
+    [0, 0, 0, 0, 12, 24],
+    [0, 0, 0, 0,  0,  3],
 ]
 
 sizes = [[4,4,1],
-		 [4,4,1],
-		 [4,4,2],
-		 [4,4,4],
-		 [4,4,8]]
+         [4,4,1],
+         [4,4,2],
+         [4,4,4],
+         [4,4,8]]
 
 strides = [[2,2,1],
-		   [2,2,1],
-		   [2,2,1],
-		   [2,2,1],
-		   [2,2,1]]
+           [2,2,1],
+           [2,2,1],
+           [2,2,1],
+           [2,2,1]]
 
 activations = [[lambda x: L.ELU(x,in_place=True) for i in l] for l in nfeatures]
 # Don't apply activation function for the final layer, so that we can compute
@@ -39,18 +39,18 @@ activations = [[lambda x: L.ELU(x,in_place=True) for i in l] for l in nfeatures]
 activations[-1][-1] = lambda x: x
 
 def up(bottom, num_output, ks, s, lr_mult=1, bias_term=False):
-	"""Implement convolution/downsample."""
+    """Implement convolution/downsample."""
     # TODO(kisuk): Factorizing 3D convolution.
-	return L.Convolution(bottom,
+    return L.Convolution(bottom,
 				num_output=num_output, kernel_size=ks, stride=s,
 				weight_filler=dict(type="msra"), param=dict(lr_mult=lr_mult),
                 bias_term=bias_term)
 
 
 def down(bottom, num_output, ks, s, lr_mult=1, bias_term=False):
-	"""Implement deconvolution/upsample."""
+    """Implement deconvolution/upsample."""
     # TODO(kisuk): Factorizing 3D deconvolution.
-	return L.Deconvolution(bottom,
+    return L.Deconvolution(bottom,
 				num_output=num_output, kernel_size=ks, stride=s,
 				weight_filler=dict(type="msra"), param=dict(lr_mult=lr_mult),
                 bias_term=bias_term)
