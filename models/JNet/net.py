@@ -13,47 +13,53 @@ from caffe import layers as L, params as P
 from collections import OrderedDict
 
 nfeatures = [
-    [1, 24,28,32,48, 64],
-    [0, 12,24,28,32, 48],
-    [0, 0, 12,24,28, 32],
-    [0, 0, 0, 12,24, 28],
-    [0, 0, 0, 0, 12, 24],
-    [0, 0, 0, 0,  0,  3],
+    [1,24,28,32,48,64],
+    [0,12,24,28,32,48],
+    [0, 0,12,24,28,32],
+    [0, 0, 0,12,24,28],
+    [0, 0, 0, 0,12,24],
+    [0, 0, 0, 0, 0, 3],
 ]
 
-sizes = [[4,4,1],
-         [4,4,1],
-         [4,4,2],
+sizes = [[1,4,4],
+         [1,4,4],
+         [2,4,4],
          [4,4,4],
-         [4,4,8]]
+         [8,4,4]]
 
-strides = [[2,2,1],
-           [2,2,1],
-           [2,2,1],
-           [2,2,1],
-           [2,2,1]]
+strides = [[1,2,2],
+           [1,2,2],
+           [1,2,2],
+           [1,2,2],
+           [1,2,2]]
 
 activations = [[lambda x: L.ELU(x,in_place=True) for i in l] for l in nfeatures]
 # Don't apply activation function for the final layer, so that we can compute
 # cross-entropy from logits.
 activations[-1][-1] = lambda x: x
 
-def up(bottom, num_output, ks, s, lr_mult=1, bias_term=False):
+def up(bottoms, num_output, ks, s, lr_mult=1, bias_term=False):
     """Implement convolution/downsample."""
     # TODO(kisuk): Factorizing 3D convolution.
-    return L.Convolution(bottom,
+    return L.Convolution(*bottoms,
 				num_output=num_output, kernel_size=ks, stride=s,
 				weight_filler=dict(type="msra"), param=dict(lr_mult=lr_mult),
                 bias_term=bias_term)
 
 
-def down(bottom, num_output, ks, s, lr_mult=1, bias_term=False):
+def down(bottoms, num_output, ks, s, lr_mult=1, bias_term=False):
     """Implement deconvolution/upsample."""
     # TODO(kisuk): Factorizing 3D deconvolution.
-    return L.Deconvolution(bottom,
+    return L.Deconvolution(*bottoms,
+            convolution_param=dict(
 				num_output=num_output, kernel_size=ks, stride=s,
-				weight_filler=dict(type="msra"), param=dict(lr_mult=lr_mult),
-                bias_term=bias_term)
+				weight_filler=dict(type="msra"), bias_term=bias_term),
+            param=dict(lr_mult=lr_mult))
+
+
+def is_valid(i,j):
+    return (i<=j and i>=0 and j>=0 and
+        i<len(nfeatures) and j<len(nfeatures[i]) and nfeatures[i][j]>0)
 
 
 def forward(net, bottom, lr_mult=1):
@@ -61,17 +67,20 @@ def forward(net, bottom, lr_mult=1):
     TODO(kisuk): Documentation.
     """
     is_input     = lambda i, j: i==0 and j==0
-    is_output    = lambda i, j: i-1==len(nfeatures) and j-1==len(nfeatures[0])
-    is_valid     = lambda i, j, x=nfeatures: i<=j and x[i][j]>0
+    is_output    = lambda i, j: i+1==len(nfeatures) and j+1==len(nfeatures[0])
     has_feedback = lambda i, j: is_valid(i-1, j)
     has_selfloop = lambda i, j, x=nfeatures: is_valid(i-1, j-1) and x[i][j]==x[i-1][j-1]
 
     tops = [[list() for j in i] for i in nfeatures]
+    tops[0][0].append(bottom)
 
     for i in xrange(len(nfeatures)):  # Time steps.
         for j in xrange(i, len(nfeatures[i])):  # Layers.
             if is_input(i,j):
-                continue
+                name = 'conv{},{}'.format(i,j+1)
+                prev = up(tops[i][j], nfeatures[i][j+1], sizes[j-i], strides[j-i], lr_mult)
+                net[name] = prev
+                tops[i][j+1].append(prev)
             elif is_output(i,j):
                 net['output'] = down(tops[i-1][j], nfeatures[i][j], sizes[j-i], strides[j-i], lr_mult, bias_term=True)
             elif is_valid(i,j):
@@ -83,7 +92,7 @@ def forward(net, bottom, lr_mult=1):
                     tops[i][j].append(prev)
                 # Self-loop connection from the previous time step.
                 if has_selfloop(i,j):
-                    prev = tops[i-1][j-1]
+                    prev = tops[i-1][j-1][0]
                     tops[i][j].append(prev)
                 # Sum, add biases, and activate.
                 if len(tops[i][j]) > 1:
@@ -91,19 +100,21 @@ def forward(net, bottom, lr_mult=1):
                     prev = L.Eltwise(*tops[i][j])
                     net['sum'+postfix] = prev
                 else:
-                    prev = tops[i][j]
+                    prev = tops[i][j][0]
                 # Add biases.
                 # prev = L.Bias(...)
                 # net['bias'+postfix] = prev
                 # Activate.
-                prev = activations(prev)
+                prev = activations[i][j](prev)
                 net['relu'+postfix] = prev
                 # Replace bottoms w/ a resulting top.
                 tops[i][j] = [prev]
                 # Propagates down to the next layer.
                 if is_valid(i,j+1):
                     name = 'conv{},{}'.format(i,j+1)
-                    net[name] = up(prev, nfeatures[i][j+1], sizes[j-i], strides[j-i], lr_mult)
+                    prev = up(tops[i][j], nfeatures[i][j+1], sizes[j-i], strides[j-i], lr_mult)
+                    net[name] = prev
+                    tops[i][j+1].append(prev)
 
 
 def net_spec(outsz):
@@ -133,24 +144,35 @@ def jnet(outsz, phase):
     # The net itself.
     forward(n, n['input'], lr_mult=lr_mult)
 
+    # Loss layer.
+    if phase == 'deploy':
+        n.sigmoid = L.Sigmoid(n['output'], in_place=True)
+    else:
+        # Custom python loss layer.
+        pylayer = 'SigmoidCrossEntropyLossLayer'
+        bottoms = [n['output'], n['label'], n['label_mask']]
+        n.loss, n.loss2, n.cerr = L.Python(*bottoms,
+            module='volume_loss_layers', layer=pylayer,
+            ntop=3, loss_weight=[1,0,0])
+
     return n.to_proto()
 
 
 def make_net(outsz):
-    # Train
+    # Train.
     phase = 'train'
     fname = '{}.prototxt'.format(phase)
     with open(fname, 'w') as f:
         f.write(str(jnet(outsz, phase)))
 
-    # Validation
+    # Validation.
     phase = 'val'
-    fname = '{}.prototxt'.formate(phase)
+    fname = '{}.prototxt'.format(phase)
     with open(fname, 'w') as f:
         f.write(str(jnet(outsz, phase)))
 
-    # Benchmark
-    phase = 'benchmark'
+    # Deploy.
+    phase = 'deploy'
     fname = '{}.prototxt'.format(phase)
     with open(fname, 'w') as f:
         f.write(str(jnet(outsz, phase)))
