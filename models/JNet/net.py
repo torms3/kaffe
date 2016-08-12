@@ -137,33 +137,33 @@ def jnet(outsz, phase):
 
 
 def make_net(outsz):
-	# Train
-	phase = 'train'
-	fname = '{}.prototxt'.format(phase)
-	with open(fname, 'w') as f:
-		f.write(str(jnet(outsz, phase)))
+    # Train
+    phase = 'train'
+    fname = '{}.prototxt'.format(phase)
+    with open(fname, 'w') as f:
+        f.write(str(jnet(outsz, phase)))
 
-	# Validation
-	phase = 'val'
-	fname = '{}.prototxt'.formate(phase)
-	with open(fname, 'w') as f:
-		f.write(str(jnet(outsz, phase)))
+    # Validation
+    phase = 'val'
+    fname = '{}.prototxt'.formate(phase)
+    with open(fname, 'w') as f:
+        f.write(str(jnet(outsz, phase)))
 
-	# Benchmark
-	phase = 'benchmark'
-	fname = '{}.prototxt'.format(phase)
-	with open(fname, 'w') as f:
-		f.write(str(jnet(outsz, phase)))
+    # Benchmark
+    phase = 'benchmark'
+    fname = '{}.prototxt'.format(phase)
+    with open(fname, 'w') as f:
+        f.write(str(jnet(outsz, phase)))
 
 
 if __name__ == '__main__':
 
-	from sys import argv
+    from sys import argv
 
-	if len(argv) == 2:
-		make_net(list(eval(argv[1])))
-	if len(argv) == 4:
-		make_net([int(argv[1]), int(argv[2]), int(argv[3])])
-	else:
-		print 'Usage: 	[python net.py z,y,x] or '
-		print '			[python net.py z y x]'
+    if len(argv) == 2:
+        make_net(list(eval(argv[1])))
+    if len(argv) == 4:
+        make_net([int(argv[1]), int(argv[2]), int(argv[3])])
+    else:
+        print 'Usage: 	[python net.py z,y,x] or '
+        print '			[python net.py z y x]'
