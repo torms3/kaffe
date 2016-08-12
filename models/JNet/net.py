@@ -57,9 +57,9 @@ def down(bottom, num_output, ks, s, lr_mult=1, bias_term=False):
 
 
 def forward(net, bottom, lr_mult=1):
-	"""
-	TODO(kisuk): Documentation.
-	"""
+    """
+    TODO(kisuk): Documentation.
+    """
     is_input     = lambda i, j: i==0 and j==0
     is_output    = lambda i, j: i-1==len(nfeatures) and j-1==len(nfeatures[0])
     is_valid     = lambda i, j, x=nfeatures: i<=j and x[i][j]>0
@@ -107,33 +107,33 @@ def forward(net, bottom, lr_mult=1):
 
 
 def net_spec(outsz):
-	in_dim  = [1,1] + outsz
-	out_dim = [1,3] + outsz
-	spec	= {'input':in_dim, 'label':out_dim, 'label_mask':out_dim}
-	return OrderedDict(sorted(spec.items(), key=lambda x: x[0]))
+    in_dim  = [1,1] + outsz
+    out_dim = [1,3] + outsz
+    spec	= {'input':in_dim, 'label':out_dim, 'label_mask':out_dim}
+    return OrderedDict(sorted(spec.items(), key=lambda x: x[0]))
 
 
 def jnet(outsz, phase):
 
     # Net specification.
-	n = caffe.NetSpec()
-	spec = net_spec(outsz)
+    n = caffe.NetSpec()
+    spec = net_spec(outsz)
 
-	# Data layers.
-	assert phase in ['train', 'val', 'deploy']
-	if phase == 'deploy':
-		n['input'] = L.Input(shape=dict(dim=spec['input']))
-	else:
-		for k, v in spec.iteritems():
-			n[k] = L.Input(shape=dict(dim=v))
+    # Data layers.
+    assert phase in ['train', 'val', 'deploy']
+    if phase == 'deploy':
+        n['input'] = L.Input(shape=dict(dim=spec['input']))
+    else:
+        for k, v in spec.iteritems():
+            n[k] = L.Input(shape=dict(dim=v))
 
-	# Patch averaging.
-	lr_mult = 1.0/(outsz[0]*outsz[1]*outsz[2])
+    # Patch averaging.
+    lr_mult = 1.0/(outsz[0]*outsz[1]*outsz[2])
 
-	# The net itself.
+    # The net itself.
     forward(n, n['input'], lr_mult=lr_mult)
 
-	return n.to_proto()
+    return n.to_proto()
 
 
 def make_net(outsz):
