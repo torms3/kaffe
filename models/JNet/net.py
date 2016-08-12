@@ -27,34 +27,38 @@ sizes = [[1,4,4],
          [4,4,4],
          [8,4,4]]
 
+
 strides = [[1,2,2],
            [1,2,2],
            [1,2,2],
            [1,2,2],
            [1,2,2]]
 
+
 activations = [[lambda x: L.ELU(x,in_place=True) for i in l] for l in nfeatures]
 # Don't apply activation function for the final layer, so that we can compute
 # cross-entropy from logits.
 activations[-1][-1] = lambda x: x
 
+
 def up(bottoms, num_output, ks, s, lr_mult=1, bias_term=False):
     """Implement convolution/downsample."""
     # TODO(kisuk): Factorizing 3D convolution.
-    return L.Convolution(*bottoms,
-				num_output=num_output, kernel_size=ks, stride=s,
-				weight_filler=dict(type="msra"), param=dict(lr_mult=lr_mult),
-                bias_term=bias_term)
+    return L.Convolution(bottoms,
+		num_output=num_output, kernel_size=ks, stride=s,
+		weight_filler=dict(type="msra"), bias_filler=dict(type="constant"),
+        param=[dict(lr_mult=lr_mult), dict(lr_mult=lr_mult)],
+        bias_term=bias_term)
 
 
-def down(bottoms, num_output, ks, s, lr_mult=1, bias_term=False):
+def down(bottoms, num_output, ks, s, lr_mult=1):
     """Implement deconvolution/upsample."""
     # TODO(kisuk): Factorizing 3D deconvolution.
-    return L.Deconvolution(*bottoms,
-            convolution_param=dict(
-				num_output=num_output, kernel_size=ks, stride=s,
-				weight_filler=dict(type="msra"), bias_term=bias_term),
-            param=dict(lr_mult=lr_mult))
+    return L.Deconvolution(bottoms,
+        convolution_param=dict(
+			num_output=num_output, kernel_size=ks, stride=s,
+			weight_filler=dict(type="msra"), bias_filler=dict(type="constant")),
+        param=[dict(lr_mult=lr_mult), dict(lr_mult=lr_mult)])
 
 
 def is_valid(i,j):
@@ -71,50 +75,50 @@ def forward(net, bottom, lr_mult=1):
     has_feedback = lambda i, j: is_valid(i-1, j)
     has_selfloop = lambda i, j, x=nfeatures: is_valid(i-1, j-1) and x[i][j]==x[i-1][j-1]
 
-    tops = [[list() for j in i] for i in nfeatures]
-    tops[0][0].append(bottom)
+    tops = [[0 for j in i] for i in nfeatures]
+    tops[0][0] = bottom
 
     for i in xrange(len(nfeatures)):  # Time steps.
         for j in xrange(i, len(nfeatures[i])):  # Layers.
             if is_input(i,j):
                 name = 'conv{},{}'.format(i,j+1)
-                prev = up(tops[i][j], nfeatures[i][j+1], sizes[j-i], strides[j-i], lr_mult)
+                prev = up(tops[i][j], nfeatures[i][j+1], sizes[j-i], strides[j-i], bias_term=True)
                 net[name] = prev
-                tops[i][j+1].append(prev)
+                tops[i][j+1] = prev
             elif is_output(i,j):
-                net['output'] = down(tops[i-1][j], nfeatures[i][j], sizes[j-i], strides[j-i], lr_mult, bias_term=True)
+                net['output'] = down(tops[i-1][j], nfeatures[i][j], sizes[j-i], strides[j-i])
             elif is_valid(i,j):
                 postfix = '{},{}'.format(i,j)
+                bottoms = list() if tops[i][j]==0 else [tops[i][j]]
                 # Top-down feedback connection from the previous time step.
                 if has_feedback(i,j):
-                    prev = down(tops[i-1][j], nfeatures[i][j], sizes[j-i], strides[j-i], lr_mult)
+                    prev = down(tops[i-1][j], nfeatures[i][j], sizes[j-i], strides[j-i])
                     net['deconv'+postfix] = prev
-                    tops[i][j].append(prev)
+                    bottoms.append(prev)
                 # Self-loop connection from the previous time step.
                 if has_selfloop(i,j):
-                    prev = tops[i-1][j-1][0]
-                    tops[i][j].append(prev)
+                    prev = tops[i-1][j-1]
+                    bottoms.append(prev)
                 # Sum, add biases, and activate.
-                if len(tops[i][j]) > 1:
+                assert len(bottoms) > 0
+                if len(bottoms) > 1:
                     # Sum, if needed.
-                    prev = L.Eltwise(*tops[i][j])
+                    prev = L.Eltwise(*bottoms)
                     net['sum'+postfix] = prev
                 else:
-                    prev = tops[i][j][0]
-                # Add biases.
-                # prev = L.Bias(...)
-                # net['bias'+postfix] = prev
+                    prev = bottoms[0]
                 # Activate.
                 prev = activations[i][j](prev)
                 net['relu'+postfix] = prev
                 # Replace bottoms w/ a resulting top.
-                tops[i][j] = [prev]
+                tops[i][j] = prev
                 # Propagates down to the next layer.
                 if is_valid(i,j+1):
                     name = 'conv{},{}'.format(i,j+1)
-                    prev = up(tops[i][j], nfeatures[i][j+1], sizes[j-i], strides[j-i], lr_mult)
+                    b = True if i==0 else False
+                    prev = up(tops[i][j], nfeatures[i][j+1], sizes[j-i], strides[j-i], bias_term=b)
                     net[name] = prev
-                    tops[i][j+1].append(prev)
+                    tops[i][j+1] = prev
 
 
 def net_spec(outsz):
@@ -138,11 +142,8 @@ def jnet(outsz, phase):
         for k, v in spec.iteritems():
             n[k] = L.Input(shape=dict(dim=v))
 
-    # Patch averaging.
-    lr_mult = 1.0/(outsz[0]*outsz[1]*outsz[2])
-
     # The net itself.
-    forward(n, n['input'], lr_mult=lr_mult)
+    forward(n, n['input'])
 
     # Loss layer.
     if phase == 'deploy':
