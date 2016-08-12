@@ -44,11 +44,13 @@ activations[-1][-1] = lambda x: x
 def up(bottoms, num_output, ks, s, lr_mult=1, bias_term=False):
     """Implement convolution/downsample."""
     # TODO(kisuk): Factorizing 3D convolution.
+    param = [dict(lr_mult=lr_mult)]
+    if bias_term:
+        param.append(dict(lr_mult=lr_mult))
     return L.Convolution(bottoms,
 		num_output=num_output, kernel_size=ks, stride=s,
 		weight_filler=dict(type="msra"), bias_filler=dict(type="constant"),
-        param=[dict(lr_mult=lr_mult), dict(lr_mult=lr_mult)],
-        bias_term=bias_term)
+        param=param, bias_term=bias_term)
 
 
 def down(bottoms, num_output, ks, s, lr_mult=1):
