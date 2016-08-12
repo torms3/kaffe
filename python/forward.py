@@ -6,8 +6,8 @@ import sys
 import time
 
 import parser
-from data_provider.python.data_provider import VolumeDataProvider
-from data_provider.python.forward import ForwardScanner
+from DataProvider.python.data_provider import VolumeDataProvider
+from DataProvider.python.forward import ForwardScanner
 
 # Initialize.
 caffe.set_device(int(sys.argv[1]))
@@ -32,7 +32,9 @@ dp = VolumeDataProvider(dspec_path, net_spec, dp_params)
 scan_spec   = eval(config.get('forward','scan_spec'))
 scan_params = eval(config.get('forward','scan_params'))
 save_prefix = config.get('forward','save_prefix')
-for idx, dataset in enumerate(dp.datasets):
+# TODO(kisuk): idx should be replaced w/ an actual dataset id.
+for dataset in dp.datasets:
+    idx = dataset.dataset_id
     print 'Forward scan dataset{}'.format(idx)
 
     # Scan loop.

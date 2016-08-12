@@ -4,6 +4,7 @@ model       = %(root)s/path/to/model/def
 weights     = %(root)s/path/to/model/weights
 data_spec   = %(root)s/data_spec/dataset.spec
 net_spec    = dict(input=(z,y,x))
-dp_params   = dict(border='mirror', drange=[0])
+fov         = (z,y,x)
+dp_params   = dict(border=dict(type='border_mirror', fov=%(fov)s), drange=[0])
 scan_spec   = dict(output=(z,y,x))
 save_prefix = /path/to/save/prefix
