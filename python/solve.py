@@ -1,3 +1,11 @@
+#!/usr/bin/env python
+__doc__ = """
+
+Training.
+
+Kisuk Lee <kisuklee@mit.edu>, 2016
+"""
+
 import caffe
 import ConfigParser
 import numpy as np
@@ -19,10 +27,15 @@ caffe.set_mode_gpu()
 train_cfg = ConfigParser.ConfigParser()
 train_cfg.read(sys.argv[2])
 
+# TODO(kisuk): Create solver.prototxt
+fname = train_cfg.get('train','solver')
+create_solver(train_cfg, fname)
+
 # Create solver.
 fname  = train_cfg.get('train','solver')
 config = parser.SolverParser().parse(fname)
-solver = caffe.SGDSolver(fname)
+# solver = caffe.SGDSolver(fname)
+solver = caffe.get_solver_from_file(fname)
 
 # Monitoring.
 monitor = stats.LearningMonitor()
@@ -36,9 +49,6 @@ if len(sys.argv) > 3:
     # Solver state.
     fname = '{}_iter_{}.solverstate.h5'.format(prefix, last_iter)
     solver.restore(fname)
-    # Snapshot.
-    # fname = '{}_iter_{}.caffemodel.h5'.format(prefix, last_iter)
-    # solver.net.copy_from(fname)
     # Stats.
     fname = '{}_iter_{}.statistics.h5'.format(prefix, last_iter)
     monitor.load(fname)
