@@ -85,7 +85,7 @@ class TrainConfig(Config):
         return params
 
 
-class FowardConfig(Config):
+class ForwardConfig(Config):
     """
     Config for inference.
     """
@@ -103,7 +103,7 @@ class FowardConfig(Config):
     def get_data_provider(self, net_spec):
         """Create a data provider for inference."""
         # Data spec path.
-        dspec_path = self.get('forward','dspec_spec')
+        dspec_path = self.get('forward','dspec_path')
         # Params for data provider.
         params = dict()
         params['drange'] = eval(self.get('forward','test_range'))
