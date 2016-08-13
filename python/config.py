@@ -21,7 +21,7 @@ class TrainConfig(ConfigParser.ConfigParser):
         self.read(fname)
 
     def get_solver(self):
-        """Create solver.prototxt and get solver from it."""
+        """Create a temporary solver file and get solver from it."""
         # Create a temporary solver file.
         fname = '__solver__.prototxt'
         f = open(fname, 'w')
