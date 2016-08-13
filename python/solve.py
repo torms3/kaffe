@@ -16,8 +16,6 @@ import config
 import score
 import stats
 
-from DataProvider.python.data_provider import VolumeDataProvider
-
 # Initialize.
 caffe.set_device(int(sys.argv[1]))
 caffe.set_mode_gpu()

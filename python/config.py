@@ -10,6 +10,8 @@ import caffe
 import ConfigParser
 import os
 
+from DataProvider.python.data_provider import VolumeDataProvider
+
 class Config(ConfigParser.ConfigParser):
     """
     Config interface.
@@ -107,7 +109,7 @@ class FowardConfig(Config):
         params['drange'] = self.get('forward','test_range')
         params['border']  = eval(self.get('forward','border'))
         # Create data provider.
-        return VolumeDataProvider(dspec_path, net_spec, params)        
+        return VolumeDataProvider(dspec_path, net_spec, params)
 
 
 if __name__ == "__main__":

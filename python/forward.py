@@ -14,7 +14,6 @@ import sys
 import time
 
 import config
-from DataProvider.python.data_provider import VolumeDataProvider
 from DataProvider.python.forward import ForwardScanner
 
 # Initialize.
@@ -32,7 +31,7 @@ net_spec = dict()
 for i in net.inputs:
     net_spec[i] = net.blobs[i].data.shape[-3:]
 
-# Create VolumeDataProvider.
+# Create data provider.
 dp = cfg.get_data_provider(net_spec)
 
 # Scan params.
