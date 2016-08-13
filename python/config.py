@@ -76,7 +76,7 @@ class TrainConfig(Config):
         params = dict()
         # Train or test range.
         opt = phase + '_range'
-        params['drange'] = self.get('train',opt)
+        params['drange'] = eval(self.get('train',opt))
         # Params for training.
         if phase == 'train':
             params['border']  = eval(self.get('train','border'))
@@ -106,8 +106,8 @@ class FowardConfig(Config):
         dspec_path = self.get('forward','dspec_spec')
         # Params for data provider.
         params = dict()
-        params['drange'] = self.get('forward','test_range')
-        params['border']  = eval(self.get('forward','border'))
+        params['drange'] = eval(self.get('forward','test_range'))
+        params['border'] = eval(self.get('forward','border'))
         # Create data provider.
         return VolumeDataProvider(dspec_path, net_spec, params)
 
