@@ -1,14 +1,12 @@
 [train]
 kaffe_root    = /path/to/kaffe/root
-project_root  = /path/to/project/root
-solver_path   = %(project_root)s/solver.prototxt
-dspec_spec    = $(kaffe_root)s/data_spec/dataset.spec
-# net_spec      = dict(input=(z,y,x), label=(z,y,x), label_mask=(z,y,x))
+dspec_path    = $(kaffe_root)s/data_spec/dataset.spec
 train_range   = [0,1,2,...]
 test_range    = [0,1,2,...]
 fov           = (z,y,x)
-border_func   = dict(type='border_mirror', fov=%(fov)s)
-data_augment  = [dict(type='flip')]
+border        = dict(type='border_mirror', fov=%(fov)s)
+augment       = [dict(type='flip')]
+dprior        = "None"
 test_interval = 500
 
 [solver]

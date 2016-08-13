@@ -2,9 +2,9 @@
 root        = /path/to/kaffe/root
 model       = %(root)s/path/to/model/def
 weights     = %(root)s/path/to/model/weights
-data_spec   = %(root)s/data_spec/dataset.spec
-net_spec    = dict(input=(z,y,x))
+dspec_path  = %(root)s/data_spec/dataset.spec
+test_range  = [0,1,2,...]
 fov         = (z,y,x)
-dp_params   = dict(border=dict(type='border_mirror', fov=%(fov)s), drange=[0])
-scan_spec   = dict(output=(z,y,x))
+border      = dict(type='border_mirror', fov=%(fov)s)
+scan_list   = ['output']
 save_prefix = /path/to/save/prefix

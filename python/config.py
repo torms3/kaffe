@@ -10,15 +10,28 @@ import caffe
 import ConfigParser
 import os
 
-class TrainConfig(ConfigParser.ConfigParser):
+class Config(ConfigParser.ConfigParser):
+    """
+    Config interface.
+    """
+
+    def __init__(self, fname):
+        """Initialize Config."""
+        ConfigParser.ConfigParser.__init__(self)
+        self.read(fname)
+
+    def get_data_provider(self, net_spec):
+        raise NotImplementedError
+
+
+class TrainConfig(Config):
     """
     TrainConfig.
     """
 
     def __init__(self, fname):
         """Initialize TrainConfig."""
-        ConfigParser.ConfigParser.__init__(self)
-        self.read(fname)
+        Config.__init__(self, fname)
 
     def get_solver(self):
         """Create a temporary solver file and get solver from it."""
@@ -41,6 +54,60 @@ class TrainConfig(ConfigParser.ConfigParser):
             val = self.get('solver',opt)
             prototxt += opt + ': ' + val + '\n'
         return prototxt
+
+    def get_data_provider(self, net_spec):
+        """Create train & test data providers."""
+        dp = dict()
+        # Data spec path.
+        dspec_path = self.get('train','dspec_path')
+        # Create train data provider.
+        params = self._get_data_provider_params('train')
+        dp['train'] = VolumeDataProvider(dspec_path, net_spec, params)
+        # Create test data provider.
+        params = self._get_data_provider_params('test')
+        dp['test'] = VolumeDataProvider(dspec_path, net_spec, params)
+        return dp
+
+    def _get_data_provider_params(self, phase):
+        """Create a parameter dictionary for data provider."""
+        assert phase in ['train','test']
+        params = dict()
+        # Train or test range.
+        opt = phase + '_range'
+        params['drange'] = self.get('train',opt)
+        # Params for training.
+        if phase == 'train':
+            params['border']  = eval(self.get('train','border'))
+            params['augment'] = eval(self.get('train','augment'))
+            params['dprior']  = eval(self.get('train','dprior'))
+        return params
+
+
+class FowardConfig(Config):
+    """
+    Config for inference.
+    """
+
+    def __init__(self, fname):
+        """Initialize ForwardConfig."""
+        Config.__init__(self, fname)
+
+    def net(self):
+        """Create an inference net."""
+        model   = self.get('forward','model')
+        weights = self.get('forward','weights')
+        return caffe.Net(model, weights, caffe.TEST)
+
+    def get_data_provider(self, net_spec):
+        """Create a data provider for inference."""
+        # Data spec path.
+        dspec_path = self.get('forward','dspec_spec')
+        # Params for data provider.
+        params = dict()
+        params['drange'] = self.get('forward','test_range')
+        params['border']  = eval(self.get('forward','border'))
+        # Create data provider.
+        return VolumeDataProvider(dspec_path, net_spec, params)        
 
 
 if __name__ == "__main__":

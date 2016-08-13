@@ -1,3 +1,11 @@
+#!/usr/bin/env python
+__doc__ = """
+
+Inference.
+
+Kisuk Lee <kisuklee@mit.edu>, 2016
+"""
+
 import ConfigParser
 import caffe
 import h5py
@@ -5,7 +13,7 @@ import os
 import sys
 import time
 
-import parser
+import config
 from DataProvider.python.data_provider import VolumeDataProvider
 from DataProvider.python.forward import ForwardScanner
 
@@ -13,26 +21,31 @@ from DataProvider.python.forward import ForwardScanner
 caffe.set_device(int(sys.argv[1]))
 caffe.set_mode_gpu()
 
-# Config.
-config = ConfigParser.ConfigParser()
-config.read(sys.argv[2])
+# Forward config.
+cfg = config.ForwardConfig(sys.argv[2])
 
 # Create an inference net.
-model   = config.get('forward','model')
-weights = config.get('forward','weights')
-net = caffe.Net(model, weights, caffe.TEST)
+net = cfg.net()
+
+# Create net spec.
+net_spec = dict()
+for i in net.inputs:
+    net_spec[i] = net.blobs[i].data.shape[-3:]
 
 # Create VolumeDataProvider.
-dspec_path = config.get('forward','data_spec')
-net_spec   = eval(config.get('forward','net_spec'))
-dp_params  = eval(config.get('forward','dp_params'))
-dp = VolumeDataProvider(dspec_path, net_spec, dp_params)
+dp = cfg.get_data_provider(net_spec)
+
+# Scan params.
+scan_list   = eval(cfg.get('forward','scan_list'))
+scan_params = eval(cfg.get('forward','scan_params'))
+save_prefix = cfg.get('forward','save_prefix')
+
+# Create scan spec.
+scan_spec = dict()
+for i in scan_list:
+    scan_spec[i] = net.blobs[i].data.shape[-4:]
 
 # Forward scan.
-scan_spec   = eval(config.get('forward','scan_spec'))
-scan_params = eval(config.get('forward','scan_params'))
-save_prefix = config.get('forward','save_prefix')
-# TODO(kisuk): idx should be replaced w/ an actual dataset id.
 for dataset in dp.datasets:
     idx = dataset.dataset_id
     print 'Forward scan dataset{}'.format(idx)
