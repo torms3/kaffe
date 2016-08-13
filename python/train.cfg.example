@@ -6,7 +6,7 @@ test_range    = [0,1,2,...]
 fov           = (z,y,x)
 border        = dict(type='border_mirror', fov=%(fov)s)
 augment       = [dict(type='flip')]
-dprior        = "None"
+dprior        = None
 test_interval = 500
 
 [solver]

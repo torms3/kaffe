@@ -1,10 +1,11 @@
 [forward]
-root        = /path/to/kaffe/root
-model       = %(root)s/path/to/model/def
-weights     = %(root)s/path/to/model/weights
-dspec_path  = %(root)s/data_spec/dataset.spec
-test_range  = [0,1,2,...]
-fov         = (z,y,x)
-border      = dict(type='border_mirror', fov=%(fov)s)
-scan_list   = ['output']
-save_prefix = /path/to/save/prefix
+kaffe_root   = /path/to/kaffe/root
+project_root = %(kaffe_root)s/path/to/project
+dspec_path   = %(kaffe_root)s/data_spec/dataset.spec
+model        = %(project_root)s/path/to/model/def
+weights      = %(project_root)s/path/to/model/weights
+test_range   = [0,1,2,...]
+fov          = (z,y,x)
+border       = dict(type='border_mirror', fov=%(fov)s)
+scan_list    = ['output']
+save_prefix  = $(project_root)/path/to/save/prefix
