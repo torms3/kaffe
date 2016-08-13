@@ -25,7 +25,7 @@ class TrainConfig(ConfigParser.ConfigParser):
         # Create a temporary solver file.
         fname = '__solver__.prototxt'
         f = open(fname, 'w')
-        f.write(self.to_proto)
+        f.write(self.to_proto())
         f.close()
         # Get solver from file.
         solver = caffe.get_solver_from_file(fname)

@@ -16,6 +16,8 @@ type: "SGD"
 train_net: "train.prototxt"
 test_net: "val.prototxt"
 test_iter: 10
+# To bypass solver's test.
+test_interval: 9999999
 display: 10
 # The base learning rate, momentum and the weight decay of the network.
 base_lr: 0.01
