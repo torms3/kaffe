@@ -49,8 +49,12 @@ for dataset in dp.datasets:
     idx = dataset.dataset_id
     print 'Forward scan dataset{}'.format(idx)
 
+    # Create ForwardScanner for the current dataset.
+    fs = ForwardScanner(dataset, scan_spec, params=scan_params)
+
+    # TODO(kisuk): Mask for overlapping inference.
+
     # Scan loop.
-    fs  = ForwardScanner(dataset, scan_spec, params=scan_params)
     ins = fs.pull()  # Fetch initial inputs.
     while ins is not None:
         start = time.time()
@@ -67,6 +71,7 @@ for dataset in dp.datasets:
         outs = dict()
         for k in scan_spec.iterkeys():
             outs[k] = net.blobs[k].data[0,...]
+        # TODO(kisuk): Mask for overlapping inference.
         fs.push(outs)    # Push current outputs.
         ins = fs.pull()  # Fetch next inputs.
 
