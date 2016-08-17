@@ -52,8 +52,6 @@ for dataset in dp.datasets:
     # Create ForwardScanner for the current dataset.
     fs = ForwardScanner(dataset, scan_spec, params=scan_params)
 
-    # TODO(kisuk): Mask for overlapping inference.
-
     # Scan loop.
     ins = fs.pull()  # Fetch initial inputs.
     while ins is not None:
@@ -65,20 +63,20 @@ for dataset in dp.datasets:
             net.blobs[k].data[0,...] = v
         # Run forward pass.
         net.forward()
-        # Elapsed time.
-        print 'Elapsed: {}'.format(time.time() - start)
         # Extract output data.
         outs = dict()
         for k in scan_spec.iterkeys():
             outs[k] = net.blobs[k].data[0,...]
-        # TODO(kisuk): Mask for overlapping inference.
         fs.push(outs)    # Push current outputs.
         ins = fs.pull()  # Fetch next inputs.
+        # Elapsed time.
+        print 'Elapsed: {}'.format(time.time() - start)
 
     # Save as file.
-    for name, data in fs.outputs.iteritems():
-        fname = '{}_dataset{}_{}.h5'.format(save_prefix, idx, name)
+    for key in fs.outputs.data.iterkeys():
+        fname = '{}_dataset{}_{}.h5'.format(save_prefix, idx, key)
         print 'Save {}...'.format(fname)
         f = h5py.File(fname)
-        f.create_dataset('/main', data=data.get_data())
+        output = fs.outputs.get_data(key)
+        f.create_dataset('/main', data=output)
         f.close()
