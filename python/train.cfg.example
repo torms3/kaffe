@@ -4,7 +4,7 @@ dspec_path    = %(kaffe_root)s/data_spec/dataset.spec
 train_range   = [0,1,2,...]
 test_range    = [0,1,2,...]
 fov           = (z,y,x)
-border        = dict(type='border_mirror', fov=%(fov)s)
+border        = dict(type='mirror_border', fov=%(fov)s)
 augment       = [dict(type='flip')]
 dprior        = None
 test_interval = 500
