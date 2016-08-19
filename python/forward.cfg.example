@@ -1,4 +1,5 @@
 [forward]
+<<<<<<< HEAD
 kaffe_root  = /path/to/kaffe/root
 dspec_path  = %(kaffe_root)s/data_spec/dataset.spec
 model       = /path/to/model/def

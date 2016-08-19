@@ -47,7 +47,7 @@ for i in scan_list:
 # Forward scan.
 for dataset in dp.datasets:
     idx = dataset.dataset_id
-    print 'Forward scan dataset{}'.format(idx)
+    print 'Forward scan dataset {}'.format(idx)
 
     # Create ForwardScanner for the current dataset.
     fs = ForwardScanner(dataset, scan_spec, params=scan_params)
@@ -68,9 +68,9 @@ for dataset in dp.datasets:
         for k in scan_spec.iterkeys():
             outs[k] = net.blobs[k].data[0,...]
         fs.push(outs)    # Push current outputs.
-        ins = fs.pull()  # Fetch next inputs.
         # Elapsed time.
         print 'Elapsed: {}'.format(time.time() - start)
+        ins = fs.pull()  # Fetch next inputs.
 
     # Save as file.
     for key in fs.outputs.data.iterkeys():
