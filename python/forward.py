@@ -74,7 +74,7 @@ for dataset in dp.datasets:
 
     # Save as file.
     for key in fs.outputs.data.iterkeys():
-        fname = '{}_dataset{}_{}.h5'.format(save_prefix, idx, key)
+        fname = '{}_dataset{}_{}.h5'.format(save_prefix, idx+1, key)
         print 'Save {}...'.format(fname)
         f = h5py.File(fname)
         output = fs.outputs.get_data(key)
