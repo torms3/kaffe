@@ -5,7 +5,7 @@ model       = /path/to/model/def
 weights     = /path/to/model/weights
 test_range  = [0,1,2,...]
 fov         = (z,y,x)
-border      = dict(type='border_mirror', fov=%(fov)s)
+border      = dict(type='mirror_border', fov=%(fov)s)
 scan_list   = ['output']
 scan_params = None
 save_prefix = /path/to/save/prefix
