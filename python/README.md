@@ -5,8 +5,8 @@
 check the example of [forward.cfg](https://github.com/torms3/kaffe/blob/master/python/forward.cfg.example)
 
 output patch size for TitanX pascal 
-J-Net: 32 x 158 x 158
-MSF: 12 x 150 x 150
+- J-Net: 32 x 158 x 158
+- MSF: 12 x 150 x 150
 
 ### run script
 
