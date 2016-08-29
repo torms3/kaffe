@@ -1,6 +1,10 @@
 # Usage
 
 ## Forward
+### prepare network model
+- In the kaffe [models](https://github.com/torms3/kaffe/tree/master/models), `python net.py z y x` will give you three net specs, `train.prototxt`, `val.prototxt`, and `deploy.prototxt`.
+- Just use `deploy.prototxt` as specified in the forward config templates.
+
 ### prepare configuration file
 check the example of [forward.cfg](https://github.com/torms3/kaffe/blob/master/python/forward.cfg.example)
 
