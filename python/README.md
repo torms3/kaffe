@@ -1,22 +1,16 @@
 # Usage
 
 ## Forward
-### prepare network model
-- In the kaffe [models](https://github.com/torms3/kaffe/tree/master/models), `python net.py z y x` will give you three net specs, `train.prototxt`, `val.prototxt`, and `deploy.prototxt`.
-- Just use `deploy.prototxt` as specified in the forward config templates.
+### Prepare network spec
+- Predefined models can be found in [kaffe/models](https://github.com/torms3/kaffe/tree/master/models). 
+- Running `python net.py z y x` will generate three `prototxt` files, i.e., `train.prototxt`, `val.prototxt`, and `deploy.prototxt`.
+- Use `deploy.prototxt` for inference.
 
-### prepare configuration file
-check the example of [forward.cfg](https://github.com/torms3/kaffe/blob/master/python/forward.cfg.example)
+### Prepare configuration file
+Example configuration file for inference: [forward.cfg.example](https://github.com/torms3/kaffe/blob/master/python/forward.cfg.example).
 
-parameters for TitanX pascal 
+### Run forward pass
 
-| Net Name      | Fov           | outsz      |
-| ------------- |:-------------:| ----------:|
-| MSF           | 9,97,97       | 12x150x150 |
-| JNet          |same with outsz| 32x158x158 |
+    python forward.py GPU_ID path/to/forward.cfg
 
-### run script
-
-    python forward.py 0 path/of/forward.cfg
-
-0 is GPU ID, but this is different from the ID you can know from `nvidia-smi`. `caffe device_query` will give you the IDs. Basically faster GPU gets assigned lower number.
+`GPU_ID` is different from what is shown from `nvidia-smi`. `caffe device_query` will let you know the precise `GPU_ID` information. Basically faster GPU gets assigned lower number.
