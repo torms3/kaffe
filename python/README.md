@@ -13,4 +13,4 @@ Example configuration file for inference: [forward.cfg.example](https://github.c
 
     python forward.py GPU_ID path/to/forward.cfg
 
-`GPU_ID` is different from what is shown from `nvidia-smi`. `caffe device_query` will let you know the precise `GPU_ID` information. Basically faster GPU gets assigned lower number.
+`GPU_ID` is different from what is shown from `nvidia-smi`. `caffe device_query` will let you know the precise `GPU_ID` information. Basically faster GPU gets assigned with lower number.
