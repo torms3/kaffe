@@ -1,7 +1,8 @@
 # Kaffe
 Caffe interface to support Deep Learning for Connectomics
 
-# Requirement
+Requirement
+------
 python2.7 numpy scipy tifffile
 
 Contact
