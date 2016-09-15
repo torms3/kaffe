@@ -10,6 +10,10 @@ class SigmoidCrossEntropyLossLayer(caffe.Layer):
         # Check inputs.
         if len(bottom) != 3:
             raise Exception("Need three inputs (propagated, label, mask).")
+        # Params is a python dictionary with layer parameters.
+        params = eval(self.param_str)
+        # Loss weight.
+        self.loss_weight = params.get('loss_weight', 1.0)
         # Threshold for computing classification error
         self.thresh = 0.5
 
@@ -31,17 +35,19 @@ class SigmoidCrossEntropyLossLayer(caffe.Layer):
         prob  = self.sigmoid(bottom[0].data)
         label = bottom[1].data
         mask  = bottom[2].data
-        # Gradient
+        # Loss weight.
+        mask = mask * self.loss_weight
+        # Gradient.
         self.diff[...] = mask*(prob - label)
-        # Cross entropy
+        # Cross entropy.
         self.cost[...] = self.cross_entropy(bottom[0].data, label)
-        # Classification error
+        # Classification error.
         self.cerr[...] = (mask>0)*((prob>self.thresh) != (label>self.thresh))
-        # Rebalanced cost
+        # Rebalanced cost.
         top[0].data[...] = np.sum(mask*self.cost)
-        # Unbalanced cost
+        # Unbalanced cost.
         top[1].data[...] = np.sum(self.cost)
-        # Classification error
+        # Classification error.
         top[2].data[...] = np.sum(self.cerr)
 
     def backward(self, top, propagate_down, bottom):
