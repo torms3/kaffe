@@ -11,7 +11,10 @@ class SigmoidCrossEntropyLossLayer(caffe.Layer):
         if len(bottom) != 3:
             raise Exception("Need three inputs (propagated, label, mask).")
         # Params is a python dictionary with layer parameters.
-        params = eval(self.param_str)
+	if not self.param_str:
+	    params = dict()
+	else:
+            params = eval(self.param_str)
         # Loss weight.
         self.loss_weight = params.get('loss_weight', 1.0)
         # Threshold for computing classification error
