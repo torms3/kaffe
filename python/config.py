@@ -74,14 +74,13 @@ class TrainConfig(Config):
         """Create a parameter dictionary for data provider."""
         assert phase in ['train','test']
         params = dict()
-        # Train or test range.
-        opt = phase + '_range'
-        params['drange'] = eval(self.get('train',opt))
-        # Params for training.
-        if phase == 'train':
-            params['border']  = eval(self.get('train','border'))
-            params['augment'] = eval(self.get('train','augment'))
-            params['dprior']  = eval(self.get('train','dprior'))
+        params['drange'] = eval(self.get(phase,'drange'))
+        if self.has_option(phase,'dprior'):  # Optional.
+            params['dprior'] = eval(self.get(phase,'dprior'))
+        if self.has_option(phase,'border'):  # Optional.
+            params['border'] = eval(self.get(phase,'border'))
+        if self.has_option(phase,'augment'):  # Optional.
+            params['augment'] = eval(self.get(phase,'augment'))
         return params
 
 
@@ -106,7 +105,7 @@ class ForwardConfig(Config):
         dspec_path = self.get('forward','dspec_path')
         # Params for data provider.
         params = dict()
-        params['drange'] = eval(self.get('forward','test_range'))
+        params['drange'] = eval(self.get('forward','drange'))
         params['border'] = eval(self.get('forward','border'))
         # Create data provider.
         return VolumeDataProvider(dspec_path, net_spec, params)

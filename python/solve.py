@@ -55,7 +55,7 @@ dp = cfg.get_data_provider(net_spec)
 display       = cfg.getint('solver','display')
 snapshot      = cfg.getint('solver','snapshot')
 test_iter     = cfg.getint('solver','test_iter')
-test_interval = cfg.getint('train','test_interval')
+test_interval = cfg.getint('test','interval')
 
 print 'Start training...'
 print 'Start from ', last_iter + 1
