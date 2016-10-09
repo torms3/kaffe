@@ -9,13 +9,14 @@ Kisuk Lee <kisuklee@mit.edu>, 2016
 import ConfigParser
 import caffe
 import h5py
+import numpy as np
 import os
 import sys
 import time
 
 import config
 from DataProvider.python.forward import ForwardScanner
-from DataProvider.python.transform import sample_func, flip, revert_flip
+from DataProvider.python.transform import flip, revert_flip
 
 # Initialize.
 caffe.set_device(int(sys.argv[1]))
@@ -63,7 +64,8 @@ for dataset in dp.datasets:
         rule = np.array([int(x) for x in bin(aug_id)[2:].zfill(4)])
         print 'Flip augmentation {}'.format(rule)
         # Apply flip transformation.
-        dataset._data = sample_func.flip(dataset._data, rule=rule)
+        for val in dataset._data.itervalues():
+            val._data = flip(val._data, rule=rule)
 
         # Create ForwardScanner for the current augmentation.
         fs = ForwardScanner(dataset, scan_spec, params=scan_params)
@@ -97,14 +99,15 @@ for dataset in dp.datasets:
             val._data += revert_flip(output, rule=rule, is_affinity=True)
             count += 1
             # Revert dataset.
-            dataset._data = sample_func.revert_flip(dataset._data, rule=rule)
+            for val in dataset._data.itervalues():
+                val._data = revert_flip(val._data, rule=rule)
 
     # Save as file.
     for key in accum.outputs.data.iterkeys():
         fname = '{}_dataset{}_{}.h5'.format(save_prefix, idx+1, key)
         print 'Save {}...'.format(fname)
         f = h5py.File(fname)
-        output = fs.outputs.get_data(key)
+        output = accum.outputs.get_data(key)
         output /= count  # Normalize.
         f.create_dataset('/main', data=output)
         f.close()
