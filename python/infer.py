@@ -98,9 +98,10 @@ for dataset in dp.datasets:
             # TODO(kisuk): Parametrize is_affinity.
             val._data += revert_flip(output, rule=rule, is_affinity=True)
             count += 1
-            # Revert dataset.
-            for val in dataset._data.itervalues():
-                val._data = revert_flip(val._data, rule=rule)
+
+        # Revert dataset.
+        for val in dataset._data.itervalues():
+            val._data = revert_flip(val._data, rule=rule)
 
     # Save as file.
     for key in accum.outputs.data.iterkeys():
