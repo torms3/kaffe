@@ -95,8 +95,8 @@ for dataset in dp.datasets:
             print 'Accumulate...'
             output = fs.outputs.get_data(key)
             # Revert output.
-            # TODO(kisuk): Parametrize is_affinity.
-            val._data += revert_flip(output, rule=rule, is_affinity=True)
+            dst = scan_list[key].get('dst', None)
+            val._data += revert_flip(output, rule=rule, dst=dst)
             count += 1
 
         # Revert dataset.

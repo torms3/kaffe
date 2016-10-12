@@ -6,6 +6,8 @@ weights     = /path/to/caffemodel
 drange      = [0,1,2,...]
 fov         = (z,y,x)
 border      = dict(type='mirror_border', fov=%(fov)s)
-scan_list   = ['output']
 scan_params = None
 save_prefix = /path/to/save/prefix
+# Inference-time augmentation.
+flip_range  = range(16)
+scan_list   = {'output':dict(dst=(1,1,1))}
