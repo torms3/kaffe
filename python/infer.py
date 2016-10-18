@@ -37,15 +37,20 @@ for i in net.inputs:
 dp = cfg.get_data_provider(net_spec)
 
 # Scan params.
-scan_list   = eval(cfg.get('forward','scan_list'))
 scan_params = eval(cfg.get('forward','scan_params'))
-save_prefix = cfg.get('forward','save_prefix')
 flip_range  = eval(cfg.get('forward','flip_range'))
+scan_list   = eval(cfg.get('forward','scan_list'))
 
 # Create scan spec.
 scan_spec = dict()
 for i in scan_list:
     scan_spec[i] = net.blobs[i].data.shape[-4:]
+
+# Save path.
+save_prefix = cfg.get('forward','save_prefix')
+save_path = os.path.dirname(save_prefix)
+if not os.path.exists(save_path):
+    os.makedirs(save_path)
 
 # Forward scan.
 for dataset in dp.datasets:
