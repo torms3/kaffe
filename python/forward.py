@@ -6,8 +6,8 @@ Inference.
 Kisuk Lee <kisuklee@mit.edu>, 2016
 """
 
-import ConfigParser
 import caffe
+import ConfigParser
 import h5py
 import os
 import sys
