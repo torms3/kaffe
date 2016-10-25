@@ -28,7 +28,7 @@ for w in wrange:
         os.makedirs(save_path)
 
     # Temporary config file.
-    f = tempfile.NamedTemporaryFile()
+    f = tempfile.NamedTemporaryFile(dir=os.getcwd())
     cfg.write(f)
 
     # Inference.
