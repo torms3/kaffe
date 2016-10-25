@@ -28,13 +28,15 @@ for w in wrange:
         os.makedirs(save_path)
 
     # Temporary config file.
-    f = tempfile.NamedTemporaryFile(dir=os.getcwd())
+    f = tempfile.NamedTemporaryFile(delete=False, dir=os.getcwd())
+    temp = os.path.basename(f.name)
     cfg.write(f)
+    f.close()
 
     # Inference.
-    temp = os.path.basename(f.name)
     sysline = 'python {} {} {}'.format(sys.argv[1],sys.argv[2],temp)
     os.system(sysline)
 
-    # Close temporary file.
-    f.close()
+    # Delete temporary file.
+    if os.path.exists(temp):
+        os.remove(temp)
