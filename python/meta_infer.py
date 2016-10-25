@@ -32,7 +32,8 @@ for w in wrange:
     cfg.write(f)
 
     # Inference.
-    sysline = 'python {} {} {}'.format(sys.argv[1],sys.argv[2],f.name)
+    temp = os.path.basename(f.name)
+    sysline = 'python {} {} {}'.format(sys.argv[1],sys.argv[2],temp)
     os.system(sysline)
 
     # Close temporary file.
