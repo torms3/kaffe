@@ -8,13 +8,11 @@ Kisuk Lee <kisuklee@mit.edu>, 2016
 import ConfigParser
 import os
 import sys
+import tempfile
 
 # Config file.
 cfg = ConfigParser.ConfigParser()
 cfg.read(sys.argv[3])
-
-# Temporary config file name.
-temp = 'temp.cfg'
 
 wrange = eval(cfg.get('forward','wrange'))
 for w in wrange:
@@ -30,13 +28,12 @@ for w in wrange:
         os.makedirs(save_path)
 
     # Temporary config file.
-    f = open(temp,'w')
+    f = tempfile.TemporaryFile()
     cfg.write(f)
-    f.close()
 
     # Inference.
-    sysline = 'python {} {} {}'.format(sys.argv[1],sys.argv[2],temp)
+    sysline = 'python {} {} {}'.format(sys.argv[1],sys.argv[2],f.name)
     os.system(sysline)
 
-    # Delete temporary file.
-    os.remove(temp)
+    # Close temporary file.
+    f.close()
