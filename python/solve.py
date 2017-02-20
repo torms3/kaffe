@@ -91,10 +91,11 @@ def run(gpu, cfg_path, async, last_iter=None):
 
         # Set inputs.
         for k, v in sample.iteritems():
-            # Assume a sole example in minibatch (single output patch).
-            shape = (1,) + v.shape
-            net.blobs[k].reshape(*shape)
-            net.blobs[k].data[0,...] = v
+            if k in net.blobs:
+                # Assume a sole example in minibatch (single output patch).
+                shape = (1,) + v.shape
+                net.blobs[k].reshape(*shape)
+                net.blobs[k].data[0,...] = v
 
         # Run forward & backward passes.
         solver.step(1)
