@@ -129,7 +129,7 @@ def run(gpu, cfg_path, async, last_iter=None):
             base_lr = cfg.getfloat('solver','base_lr')
             print 'Iteration %7d, loss: %.3f, learning rate: %.6f, '     \
                   'backend: %.3f s/iter, elapsed: %.3f s/iter'   \
-                    % (i, stats['loss'], base_lr, elapsed, backend)
+                    % (i, stats['loss'], base_lr, backend, elapsed)
             # Reset.
             for key in stats.iterkeys():
                 stats[key] = 0.0
