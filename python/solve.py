@@ -87,7 +87,7 @@ def run(gpu, cfg_path, async, last_iter=None):
     # Training loop.
     for i in range(last_iter+1, solver.max_iter+1):
 
-        sample = samper() if q.empty() else q.get()
+        sample = samper() if not async or q.empty() else q.get()
 
         # Set inputs.
         for k, v in sample.iteritems():
@@ -136,7 +136,8 @@ def run(gpu, cfg_path, async, last_iter=None):
             fname = '{}_iter_{}.statistics.h5'.format(prefix, i)
             monitor.save(fname, elapsed)
 
-    t.join()
+    if async:
+        t.join()
 
 if __name__ == '__main__':
 
