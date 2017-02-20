@@ -8,14 +8,24 @@ Kisuk Lee <kisuklee@mit.edu>, 2016
 
 import caffe
 import numpy as np
-from multiprocessing import Pool
+from multiprocessing import Queue
 import os
 import sys
+import threading
 import time
 
 import config
 import score
 import stats as st
+
+def sample_daemon(sampler, q):
+    SLEEP = 2
+    while True:
+        if not q.full():
+            q.put(sampler())
+        else:
+            time.sleep(SLEEP)
+
 
 def run(gpu, cfg_path, async, last_iter=None):
     # Initialize.
@@ -67,16 +77,17 @@ def run(gpu, cfg_path, async, last_iter=None):
     start = time.time()
 
     # Asynchronous sampler.
-    pool = Pool(processes=1)
+    sampler = dp['train']
     if async:
-        result = pool.apply_async(dp['train'])
-    else:
-        result = pool.apply(dp['train'])
+        q = Queue(maxsize=10)
+        t = threading.Thread(target=sample_daemon, args=(sampler, q))
+        t.daemon = True
+        t.start()
 
     # Training loop.
     for i in range(last_iter+1, solver.max_iter+1):
 
-        sample = result.get(timeout=None)
+        sample = samper() if q.empty() else q.get()
 
         # Set inputs.
         for k, v in sample.iteritems():
@@ -84,12 +95,6 @@ def run(gpu, cfg_path, async, last_iter=None):
             shape = (1,) + v.shape
             net.blobs[k].reshape(*shape)
             net.blobs[k].data[0,...] = v
-
-        # Draw the next sample.
-        if async:
-            result = pool.apply_async(dp['train'])
-        else:
-            result = pool.apply(dp['train'])
 
         # Run forward & backward passes.
         solver.step(1)
@@ -130,6 +135,7 @@ def run(gpu, cfg_path, async, last_iter=None):
             fname = '{}_iter_{}.statistics.h5'.format(prefix, i)
             monitor.save(fname, elapsed)
 
+    t.join()
 
 if __name__ == '__main__':
 
