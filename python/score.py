@@ -10,7 +10,7 @@ import caffe
 import numpy as np
 import time
 
-def test_net(iter, solver, test_iter, dp, monitor=None):
+def test_net(iter, solver, test_iter, sampler, monitor=None):
     """
     Run test loop.
     """
@@ -30,12 +30,13 @@ def test_net(iter, solver, test_iter, dp, monitor=None):
     for i in range(1,test_iter+1):
 
         # Set inputs.
-        sample = dp.random_sample()
+        sample = sampler()
         for k, v in sample.iteritems():
-            # Assume a sole example in minibatch (single output patch).
-            shape = (1,) + v.shape
-            net.blobs[k].reshape(*shape)
-            net.blobs[k].data[0,...] = v
+            if k in net.blobs:
+                # Assume a sole example in minibatch (single output patch).
+                shape = (1,) + v.shape
+                net.blobs[k].reshape(*shape)
+                net.blobs[k].data[0,...] = v
 
         # Run forward pass.
         net.forward()
