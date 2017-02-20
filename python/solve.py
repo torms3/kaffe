@@ -15,7 +15,7 @@ import time
 
 import config
 import score
-import stats
+import stats as st
 
 def run(gpu, cfg_path, async, last_iter=None):
     # Initialize.
@@ -29,7 +29,7 @@ def run(gpu, cfg_path, async, last_iter=None):
     solver = cfg.get_solver()
 
     # Monitoring.
-    monitor = stats.LearningMonitor()
+    monitor = st.LearningMonitor()
     stats = dict(loss=0.0, nmsk=0.0)
 
     # Load net, if any.
@@ -68,12 +68,15 @@ def run(gpu, cfg_path, async, last_iter=None):
 
     # Asynchronous sampler.
     pool = Pool(processes=1)
-    result = pool.apply_async(dp['train']) if async else dp['train']()
+    if async:
+        result = pool.apply_async(dp['train'])
+    else:
+        result = pool.apply(dp['train'])
 
     # Training loop.
     for i in range(last_iter+1, solver.max_iter+1):
 
-        sample = result.get()
+        sample = result.get(timeout=None)
 
         # Set inputs.
         for k, v in sample.iteritems():
@@ -83,7 +86,10 @@ def run(gpu, cfg_path, async, last_iter=None):
             net.blobs[k].data[0,...] = v
 
         # Draw the next sample.
-        result = pool.apply_async(dp['train']) if async else dp['train']()
+        if async:
+            result = pool.apply_async(dp['train'])
+        else:
+            result = pool.apply(dp['train'])
 
         # Run forward & backward passes.
         solver.step(1)
