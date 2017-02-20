@@ -134,6 +134,7 @@ def run(gpu, cfg_path, async, last_iter=None):
             for key in stats.iterkeys():
                 stats[key] = 0.0
             total_time = 0.0
+            backend_time = 0.0
             start = time.time()
 
         # Test loop.
