@@ -10,7 +10,7 @@ import caffe
 import ConfigParser
 import os
 
-from DataProvider.python.data_provider import VolumeDataProvider
+from DataProvider.python.data_provider import VolumeDataProvider, Sampler
 
 class Config(ConfigParser.ConfigParser):
     """
@@ -59,16 +59,18 @@ class TrainConfig(Config):
 
     def get_data_provider(self, net_spec):
         """Create train & test data providers."""
-        dp = dict()
+        ret = dict()
         # Data spec path.
         dspec_path = self.get('train','dspec_path')
         # Create train data provider.
         params = self._get_data_provider_params('train')
-        dp['train'] = VolumeDataProvider(dspec_path, net_spec, params)
+        dp = VolumeDataProvider(dspec_path, net_spec, params)
+        ret['train'] = Sampler(dp)
         # Create test data provider.
         params = self._get_data_provider_params('test')
-        dp['test'] = VolumeDataProvider(dspec_path, net_spec, params)
-        return dp
+        dp = VolumeDataProvider(dspec_path, net_spec, params)
+        ret['test'] = Sampler(dp)
+        return ret
 
     def _get_data_provider_params(self, phase):
         """Create a parameter dictionary for data provider."""
@@ -108,7 +110,7 @@ class ForwardConfig(Config):
         params['drange'] = eval(self.get('forward','drange'))
         params['border'] = eval(self.get('forward','border'))
         # Create data provider.
-        return VolumeDataProvider(dspec_path, net_spec, params)
+        return VolumeDataProvider(dspec_path, net_spec, params)        
 
 
 if __name__ == "__main__":

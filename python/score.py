@@ -20,7 +20,7 @@ def test_net(iter, solver, test_iter, dp, monitor=None):
     net = solver.test_nets[0]
 
     # Monitoring.
-    stats = dict(loss=0.0, cerr=0.0, nmsk=0.0)
+    stats = dict(loss=0.0, nmsk=0.0)
 
     # Timing.
     start = time.time()
@@ -42,8 +42,6 @@ def test_net(iter, solver, test_iter, dp, monitor=None):
 
         # Loss.
         stats['loss'] += net.blobs['loss'].data
-        # Classification error.
-        stats['cerr'] += net.blobs['cerr'].data
         # Number of valid voxels.
         stats['nmsk'] += np.count_nonzero(net.blobs['label_mask'].data>0)
         # Elapsed time.
@@ -53,10 +51,9 @@ def test_net(iter, solver, test_iter, dp, monitor=None):
     # Normalize.
     elapsed = total_time/test_iter
     stats['loss'] /= stats['nmsk']
-    stats['cerr'] /= stats['nmsk']
     # Bookkeeping.
     if monitor is not None:
         monitor.append_test(iter, stats)
     # Display.
-    print '[test] Iteration %d, loss: %.3f, cerr: %.3f, elapsed: %.3f s/iter'\
-          % (iter, stats['loss'], stats['cerr'], elapsed)
+    print '[test] Iteration %d, loss: %.3f, elapsed: %.3f s/iter'\
+          % (iter, stats['loss'], elapsed)
