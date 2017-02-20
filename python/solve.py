@@ -74,6 +74,7 @@ def run(gpu, cfg_path, async, last_iter=None):
 
     # Timing.
     total_time = 0.0
+    backend_time = 0.0
     start = time.time()
 
     # Asynchronous sampler.
@@ -87,7 +88,13 @@ def run(gpu, cfg_path, async, last_iter=None):
     # Training loop.
     for i in range(last_iter+1, solver.max_iter+1):
 
-        sample = sampler() if not async or q.empty() else q.get()
+        if async:
+            while True:
+                if not q.empty():
+                    sample = q.get()
+                    break;
+        else:
+            sample = sampler()
 
         # Set inputs.
         for k, v in sample.iteritems():
@@ -98,7 +105,9 @@ def run(gpu, cfg_path, async, last_iter=None):
                 net.blobs[k].data[0,...] = v
 
         # Run forward & backward passes.
+        backend_start = time.time()
         solver.step(1)
+        backend_time += time.time() - backend_start
 
         # Loss.
         stats['loss'] += net.blobs['loss'].data
@@ -112,14 +121,15 @@ def run(gpu, cfg_path, async, last_iter=None):
         if i % display == 0:
             # Normalize.
             elapsed = total_time/display
+            backend = backend_time/display
             stats['loss'] /= stats['nmsk']
             # Bookkeeping.
             monitor.append_train(i, stats)
             # Display.
             base_lr = cfg.getfloat('solver','base_lr')
-            print 'Iteration %7d, loss: %.3f, '     \
-                  'learning rate: %.6f, elapsed: %.3f s/iter'   \
-                    % (i, stats['loss'], base_lr, elapsed)
+            print 'Iteration %7d, loss: %.3f, learning rate: %.6f, '     \
+                  'backend: %.3f s/iter, elapsed: %.3f s/iter'   \
+                    % (i, stats['loss'], base_lr, elapsed, backend)
             # Reset.
             for key in stats.iterkeys():
                 stats[key] = 0.0
