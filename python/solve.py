@@ -87,7 +87,7 @@ def run(gpu, cfg_path, async, last_iter=None):
     # Training loop.
     for i in range(last_iter+1, solver.max_iter+1):
 
-        sample = samper() if not async or q.empty() else q.get()
+        sample = sampler() if not async or q.empty() else q.get()
 
         # Set inputs.
         for k, v in sample.iteritems():
