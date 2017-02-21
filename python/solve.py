@@ -8,7 +8,7 @@ Kisuk Lee <kisuklee@mit.edu>, 2016
 
 import caffe
 import numpy as np
-from multiprocessing import Queue
+from Queue import Queue
 import os
 import sys
 import threading
@@ -18,13 +18,12 @@ import config
 import score
 import stats as st
 
-def sample_daemon(sampler, q):
-    SLEEP = 2
+def sample_daemon(sampler, f, q):
     while True:
         if not q.full():
-            q.put(sampler())
+            q.put(f(sampler()))
         else:
-            time.sleep(SLEEP)
+            q.join()
 
 
 def run(gpu, cfg_path, async, last_iter=None):
@@ -79,6 +78,7 @@ def run(gpu, cfg_path, async, last_iter=None):
 
     # Asynchronous sampler.
     sampler = dp['train']
+    f =
     if async:
         q = Queue(maxsize=10)
         t = threading.Thread(target=sample_daemon, args=(sampler, q))
@@ -89,10 +89,8 @@ def run(gpu, cfg_path, async, last_iter=None):
     for i in range(last_iter+1, solver.max_iter+1):
 
         if async:
-            while True:
-                if not q.empty():
-                    sample = q.get()
-                    break;
+            sample = q.get(block=True, timeout=None)
+            q.task_done()
         else:
             sample = sampler()
 
