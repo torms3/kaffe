@@ -18,10 +18,10 @@ import config
 import score
 import stats as st
 
-def sample_daemon(sampler, f, q):
+def sample_daemon(sampler, q):
     while True:
         if not q.full():
-            q.put(f(sampler()))
+            q.put(sampler())
         else:
             q.join()
 
@@ -78,7 +78,6 @@ def run(gpu, cfg_path, async, last_iter=None):
 
     # Asynchronous sampler.
     sampler = dp['train']
-    f =
     if async:
         q = Queue(maxsize=10)
         t = threading.Thread(target=sample_daemon, args=(sampler, q))
