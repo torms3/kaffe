@@ -18,7 +18,7 @@ import config
 from DataProvider.python.forward import ForwardScanner
 from DataProvider.python.transform import flip, revert_flip
 
-def run(gpu, cfg_path, missing=None):
+def run(gpu, cfg_path):
     """
     Run inference loop.
     """
@@ -64,11 +64,6 @@ def run(gpu, cfg_path, missing=None):
         # Create ForwardScanner for the current dataset.
         accum = ForwardScanner(dataset, scan_spec)
         count = 0.0
-
-        # Apply missing section.
-        if missing is not None:
-            for val in dataset._data.itervalues():
-                val._data[...,missing,:,:] *= 0
 
         # Inference-time augmentation.
         # Flip augmentation.
@@ -137,8 +132,7 @@ if __name__ == '__main__':
 
     parser.add_argument('gpu', type=int, help='gpu device id.')
     parser.add_argument('cfg', help='inference configuration.')
-    parser.add_argument('-missing', type=str, help='z-sections to zero-out')
 
     args = parser.parse_args()
 
-    run(args.gpu, args.cfg, eval(args.missing))
+    run(args.gpu, args.cfg)
