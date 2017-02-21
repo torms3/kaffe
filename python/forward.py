@@ -46,7 +46,7 @@ for i in scan_list:
 
 # Forward scan.
 for dataset in dp.datasets:
-    idx = dataset.dataset_id
+    idx = dataset.params['dataset_id']
     print 'Forward scan dataset {}'.format(idx)
 
     # Create ForwardScanner for the current dataset.
