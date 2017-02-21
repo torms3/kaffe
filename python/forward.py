@@ -51,7 +51,7 @@ if not os.path.exists(save_path):
 
 # Forward scan.
 for dataset in dp.datasets:
-    idx = dataset.dataset_id
+    idx = dataset.param['dataset_id']
     print 'Forward scan dataset {}'.format(idx)
 
     # Create ForwardScanner for the current dataset.
