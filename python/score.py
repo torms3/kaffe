@@ -23,7 +23,7 @@ def test_net(iter, solver, test_iter, sampler, keys, monitor=None):
     # Monitoring.
     loss = dict()
     nmsk = dict()
-    for k in keys():
+    for k in keys:
         loss[k] = 0.0
         nmsk[k] = 0.0
 
