@@ -48,8 +48,8 @@ def test_net(iter, solver, test_iter, sampler, keys, monitor=None):
 
         # Update stats.
         for k in loss.iterkeys():
-            loss[k] += net.blobs[k].data
-            nmsk[k] += np.count_nonzero(net.blobs[k+'_mask'].data>0)
+            loss[k] += net.blobs[k+'_loss'].data
+            nmsk[k] += np.count_nonzero(net.blobs[k+'_label_mask'].data>0)
 
         # Elapsed time.
         total_time += time.time() - start
