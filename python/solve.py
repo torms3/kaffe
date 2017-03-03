@@ -60,8 +60,8 @@ def run(gpu, cfg_path, async, last_iter=None):
     for i in net.inputs:
         net_spec[i] = net.blobs[i].data.shape[-3:]
         # Loss stats.
-        if '_label' in i:
-            label, _ = i.split('_label')
+        if '_mask' in i:
+            label, _ = i.split('_mask')
             loss[label] = 0.0
             nmsk[label] = 0.0
 
