@@ -61,7 +61,7 @@ def test_net(iter, solver, test_iter, sampler, keys, monitor=None):
         loss[k] /= nmsk[k]
     # Bookkeeping.
     if monitor is not None:
-        monitor.append_test(iter, stats)
+        monitor.append_test(iter, loss)
     # Display.
     disp = '[test] Iteration %d, ' % iter
     for k, v in loss.iteritems():
