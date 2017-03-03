@@ -7,6 +7,7 @@ Kisuk Lee <kisuklee@mit.edu>, 2016
 """
 
 import caffe
+from collections import OrderedDict
 import numpy as np
 import time
 
@@ -21,8 +22,8 @@ def test_net(iter, solver, test_iter, sampler, keys, monitor=None):
     net = solver.net
 
     # Monitoring.
-    loss = dict()
-    nmsk = dict()
+    loss = OrderedDict()
+    nmsk = OrderedDict()
     for k in keys:
         loss[k] = 0.0
         nmsk[k] = 0.0

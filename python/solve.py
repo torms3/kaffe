@@ -7,6 +7,7 @@ Kisuk Lee <kisuklee@mit.edu>, 2016
 """
 
 import caffe
+from collections import OrderedDict
 import numpy as np
 from Queue import Queue
 import os
@@ -64,6 +65,10 @@ def run(gpu, cfg_path, async, last_iter=None):
             label, _ = i.split('_mask')
             loss[label] = 0.0
             nmsk[label] = 0.0
+
+    # Sort.
+    loss = OrderedDict(sorted(loss.items(), key=lambda x: x[0]))
+    nmsk = OrderedDict(sorted(nmsk.items(), key=lambda x: x[0]))
 
     # Create data providers.
     dp = cfg.get_data_provider(net_spec)
