@@ -60,8 +60,8 @@ def run(gpu, cfg_path, async, last_iter=None):
     for i in net.inputs:
         net_spec[i] = net.blobs[i].data.shape[-3:]
         # Loss stats.
-        if '_label_mask' in i:
-            label, _ = i.split('_label_mask')
+        if '_label' in i:
+            label, _ = i.split('_label')
             loss[label] = 0.0
             nmsk[label] = 0.0
 
@@ -116,7 +116,7 @@ def run(gpu, cfg_path, async, last_iter=None):
         # Update stats.
         for k in loss.iterkeys():
             loss[k] += net.blobs[k+'_loss'].data
-            nmsk[k] += np.count_nonzero(net.blobs[k+'_label_mask'].data>0)
+            nmsk[k] += np.count_nonzero(net.blobs[k+'_mask'].data>0)
 
         # Elapsed time.
         total_time += time.time() - start
