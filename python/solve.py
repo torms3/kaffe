@@ -16,7 +16,7 @@ import time
 
 import config
 import score
-import stats as st
+import stats
 
 def sample_daemon(sampler, f, q):
     while True:
@@ -38,8 +38,9 @@ def run(gpu, cfg_path, async, last_iter=None):
     solver = cfg.get_solver()
 
     # Monitoring.
-    monitor = st.LearningMonitor()
-    stats = dict(loss=0.0, nmsk=0.0)
+    monitor = stats.LearningMonitor()
+    loss = dict()
+    nmsk = dict()
 
     # Load net, if any.
     prefix = eval(cfg.get('solver','snapshot_prefix'))
@@ -58,6 +59,11 @@ def run(gpu, cfg_path, async, last_iter=None):
     net_spec = dict()
     for i in net.inputs:
         net_spec[i] = net.blobs[i].data.shape[-3:]
+        # Loss stats.
+        if '_mask' in i:
+            label, _ = i.split('_mask')
+            loss[label] = 0.0
+            nmsk[label] = 0.0
 
     # Create data providers.
     dp = cfg.get_data_provider(net_spec)
@@ -65,7 +71,7 @@ def run(gpu, cfg_path, async, last_iter=None):
     # Test & test loop parms.
     display       = cfg.getint('solver','display')
     snapshot      = cfg.getint('solver','snapshot')
-    test_iter     = cfg.getint('solver','test_iter')
+    test_iter     = cfg.getint('test','test_iter')
     test_interval = cfg.getint('test','interval')
 
     print 'Start training...'
@@ -88,6 +94,7 @@ def run(gpu, cfg_path, async, last_iter=None):
     # Training loop.
     for i in range(last_iter+1, solver.max_iter+1):
 
+        # Draw a sample.
         if async:
             sample = q.get(block=True, timeout=None)
             q.task_done()
@@ -107,10 +114,11 @@ def run(gpu, cfg_path, async, last_iter=None):
         solver.step(1)
         backend_time += time.time() - backend_start
 
-        # Loss.
-        stats['loss'] += net.blobs['loss'].data
-        # Number of valid voxels
-        stats['nmsk'] += np.count_nonzero(net.blobs['label_mask'].data>0)
+        # Update stats.
+        for k in loss.iterkeys():
+            loss[k] += net.blobs[k].data
+            nmsk[k] += np.count_nonzero(net.blobs[k+'_mask'].data>0)
+
         # Elapsed time.
         total_time += time.time() - start
         start = time.time()
@@ -120,24 +128,31 @@ def run(gpu, cfg_path, async, last_iter=None):
             # Normalize.
             elapsed = total_time/display
             backend = backend_time/display
-            stats['loss'] /= stats['nmsk']
+            for k in loss.iterkeys():
+                loss[k] /= nmsk[k]
             # Bookkeeping.
-            monitor.append_train(i, stats)
+            monitor.append_train(i, loss)
             # Display.
             base_lr = cfg.getfloat('solver','base_lr')
-            print 'Iteration %7d, loss: %.3f, learning rate: %.6f, '     \
-                  'backend: %.3f s/iter, elapsed: %.3f s/iter'   \
-                    % (i, stats['loss'], base_lr, backend, elapsed)
+            disp = 'Iteration %7d, ' % i
+            for k, v in loss.iteritems():
+                disp += '%s: %.3f, ' % (k, v)
+            disp += 'learning rate: %.6f, '  % base_lr
+            disp += 'backend: %.3f s/iter, ' % backend
+            disp += 'elapsed: %.3f s/iter.'  % elapsed
+            print disp
             # Reset.
-            for key in stats.iterkeys():
-                stats[key] = 0.0
+            for k in loss.iterkeys():
+                loss[k] = 0.0
+                nmsk[k] = 0.0
             total_time = 0.0
             backend_time = 0.0
             start = time.time()
 
         # Test loop.
         if i % test_interval == 0:
-            score.test_net(i, solver, test_iter, dp['test'], monitor)
+            score.test_net(i, solver, test_iter, dp['test'], loss.keys(),
+                            monitor=monitor)
             start = time.time()  # Skip test time.
 
         # Save stats.

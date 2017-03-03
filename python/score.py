@@ -10,17 +10,22 @@ import caffe
 import numpy as np
 import time
 
-def test_net(iter, solver, test_iter, sampler, monitor=None):
+def test_net(iter, solver, test_iter, sampler, keys, monitor=None):
     """
     Run test loop.
     """
 
     # Test net.
-    solver.test_nets[0].share_with(solver.net)
-    net = solver.test_nets[0]
+    # solver.test_nets[0].share_with(solver.net)
+    # net = solver.test_nets[0]
+    net = solver.net
 
     # Monitoring.
-    stats = dict(loss=0.0, nmsk=0.0)
+    loss = dict()
+    nmsk = dict()
+    for k in keys():
+        loss[k] = 0.0
+        nmsk[k] = 0.0
 
     # Timing.
     start = time.time()
@@ -41,20 +46,25 @@ def test_net(iter, solver, test_iter, sampler, monitor=None):
         # Run forward pass.
         net.forward()
 
-        # Loss.
-        stats['loss'] += net.blobs['loss'].data
-        # Number of valid voxels.
-        stats['nmsk'] += np.count_nonzero(net.blobs['label_mask'].data>0)
+        # Update stats.
+        for k in loss.iterkeys():
+            loss[k] += net.blobs[k].data
+            nmsk[k] += np.count_nonzero(net.blobs[k+'_mask'].data>0)
+
         # Elapsed time.
         total_time += time.time() - start
         start = time.time()
 
     # Normalize.
     elapsed = total_time/test_iter
-    stats['loss'] /= stats['nmsk']
+    for k in loss.iterkeys():
+        loss[k] /= nmsk[k]
     # Bookkeeping.
     if monitor is not None:
         monitor.append_test(iter, stats)
     # Display.
-    print '[test] Iteration %d, loss: %.3f, elapsed: %.3f s/iter'\
-          % (iter, stats['loss'], elapsed)
+    disp = '[test] Iteration %d, ' % iter
+    for k, v in loss.iteritems():
+        disp += '%s: %.3f, ' % (k, v)
+    disp += 'elapsed: %.3f s/iter.'  % elapsed
+    print disp

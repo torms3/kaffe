@@ -11,14 +11,16 @@ augment    = [dict(type='flip')]
 drange     = [0,1,2,...]
 dprior     = None
 interval   = 500
+test_iter  = 10
 
 [solver]
 type: "SGD"
 train_net: "train.prototxt"
-test_net: "val.prototxt"
-test_iter: 10
+# test_net: "val.prototxt"
+# test_iter: 10
 # To bypass solver's test.
-test_interval: 99999999
+# test_interval: 99999999
+test_initialization: False
 display: 10
 # The base learning rate, momentum and the weight decay of the network.
 base_lr: 0.01
