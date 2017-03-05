@@ -18,7 +18,7 @@ import config
 from DataProvider.python.forward import ForwardScanner
 from DataProvider.python.transform import flip, revert_flip
 
-def run(gpu, cfg_path, aug_spec):
+def run(gpu, cfg_path):
     """
     Run inference loop.
     """
@@ -42,8 +42,9 @@ def run(gpu, cfg_path, aug_spec):
 
     # Scan params.
     scan_params = eval(cfg.get('forward','scan_params'))
-    flip_range  = eval(cfg.get('forward','flip_range'))
+    flip_spec   = eval(cfg.get('forward','flip_spec'))
     scan_list   = eval(cfg.get('forward','scan_list'))
+    flip_range  = range(max(flip_spec.keys()) + 1)
 
     # Create scan spec.
     scan_spec = dict()
@@ -55,9 +56,6 @@ def run(gpu, cfg_path, aug_spec):
     save_path = os.path.dirname(save_prefix)
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-
-    # Fix flip range.
-    flip_range = aug_spec.keys()
 
     # Forward scan.
     for dataset in dp.datasets:
@@ -117,9 +115,9 @@ def run(gpu, cfg_path, aug_spec):
                 val._data = revert_flip(val._data, rule=rule)
 
             # Save as file.
-            if aug_id in aug_spec:
+            if aug_id in flip_spec:
                 prefix  = os.path.basename(save_prefix)
-                dirname = save_path + '/' + aug_spec[aug_id]
+                dirname = save_path + '/' + flip_spec[aug_id]
                 if not os.path.exists(dirname): os.makedirs(dirname)
                 for key in accum.outputs.data.iterkeys():
                     fname = '{}/{}_dataset{}_{}.h5'.format(dirname, prefix, did+1, key)
@@ -140,7 +138,6 @@ if __name__ == '__main__':
 
     parser.add_argument('gpu', type=int, help='gpu device id.')
     parser.add_argument('cfg', help='inference config.')
-    parser.add_argument('-aug_spec', help='augmentation spec.')
 
     args = parser.parse_args()
-    run(args.gpu, args.cfg, eval(args.aug_spec))
+    run(args.gpu, args.cfg)

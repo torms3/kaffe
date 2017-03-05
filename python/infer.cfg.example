@@ -10,5 +10,4 @@ border      = dict(type='mirror_border', fov=%(fov)s)
 scan_params = None
 save_prefix = /path/to/save/iter_%(witer)s/prefix
 # Inference-time augmentation.
-flip_range  = range(16)
 scan_list   = {'output':dict(dst=(1,1,1))}

@@ -10,6 +10,8 @@ import os
 import sys
 import tempfile
 
+import config
+
 def run(cfg_path, sysline):
     # Config file.
     cfg = config.TrainConfig(cfg_path)
@@ -54,4 +56,4 @@ if __name__ == '__main__':
     parser.add_argument('cfg', help='meta config.')
 
     args = parser.parse_args()
-    run(args.cfg, args.sysline)
+    run(args.cfg, args.sys)
