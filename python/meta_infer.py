@@ -37,7 +37,7 @@ def run(cfg_path, sysline):
         f.close()
 
         # Inference.
-        sysline = 'python ' + sysline + ' ' + temp
+        sysline += temp
         os.system(sysline)
 
         # Delete temporary file.
@@ -52,8 +52,10 @@ if __name__ == '__main__':
     dsc = 'Meta-inference.'
     parser = argparse.ArgumentParser(description=dsc)
 
-    parser.add_argument('sys', help='sysline.')
+    parser.add_argument('exc', help='excutable.')
+    parser.add_argument('gpu', type=int, help='gpu device id.')
     parser.add_argument('cfg', help='meta config.')
 
     args = parser.parse_args()
-    run(args.cfg, args.sys)
+    sysline = 'python {} {} '.format(args.exc, args.gpu)
+    run(args.cfg, sysline)
