@@ -42,7 +42,6 @@ def run(gpu, cfg_path):
 
     # Scan params.
     scan_params = eval(cfg.get('forward','scan_params'))
-    flip_range  = eval(cfg.get('forward','flip_range'))
     scan_list   = eval(cfg.get('forward','scan_list'))
 
     # Create scan spec.
