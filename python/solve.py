@@ -165,7 +165,7 @@ def run(gpu, cfg_path, async, last_iter=None):
         # Save stats.
         if i % snapshot == 0:
             fname = '{}_iter_{}.statistics.h5'.format(prefix, i)
-            monitor.save(fname, elapsed)
+            monitor.save(fname, elapsed, base_lr)
 
     if async:
         t.join()
