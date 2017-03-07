@@ -37,8 +37,7 @@ def run(cfg_path, sysline):
         f.close()
 
         # Inference.
-        sysline += temp
-        os.system(sysline)
+        os.system(sysline + temp)
 
         # Delete temporary file.
         if os.path.exists(temp):
