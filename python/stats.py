@@ -53,7 +53,7 @@ class LearningMonitor:
             self.test[key] = list(data.value)
         f.close()
 
-    def save(self, fname, elapsed, base_lr=lr):
+    def save(self, fname, elapsed, base_lr=0):
         """Save stats."""
         if os.path.exists(fname):
             os.remove(fname)
@@ -67,7 +67,7 @@ class LearningMonitor:
             f.create_dataset('/test/{}'.format(key), data=data)
         # Iteration speed in (s/iteration).
         f.create_dataset('/elapsed', data=elapsed)
-        f.create_dataset('/base_lr', data=lr)
+        f.create_dataset('/base_lr', data=base_lr)
         f.close()
 
     ####################################################################
