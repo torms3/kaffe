@@ -16,8 +16,6 @@ import time
 import config
 from DataProvider.python.forward import ForwardScanner
 
-# SET BATCH SIZE HERE
-batch_size = 5 
 # Initialize.
 caffe.set_device(int(sys.argv[1]))
 caffe.set_mode_gpu()
@@ -55,53 +53,28 @@ for dataset in dp.datasets:
     fs = ForwardScanner(dataset, scan_spec, params=scan_params)
 
     # Scan loop.
-    ins = fs.pull_n(batch_size)  # Fetch initial inputs.
-  
-    inference_start = time.time() 
-    count = 0 
+    ins = fs.pull()  # Fetch initial inputs.
     while ins is not None:
         start = time.time()
-        count += 1 
         # Set inputs.
-        in_shape = None
-
-        for b in xrange(batch_size): 
-            if ins[b] != None:
-                for k, v in ins[b].iteritems():
-                    if in_shape is None:
-                        in_shape = (batch_size,) + v.shape
-                    net.blobs[k].reshape(*in_shape)
-                    net.blobs[k].data[b,...] = v
+        for k, v in ins.iteritems():
+            shape = (1,) + v.shape
+            net.blobs[k].reshape(*shape)
+            net.blobs[k].data[0,...] = v
         # Run forward pass.
         net.forward()
         # Extract output data.
-        outs = []
- 
+        outs = dict()
         for k in scan_spec.iterkeys():
-            # doesn't cause index out of bound, and unneeded outputs 
-            # are discarded later. 
-            for b in xrange(batch_size): 
-                outs.append({k: net.blobs[k].data[b,...]})
-
-        #if count == 486:
-            #import pdb; pdb.set_trace() 
-        fs.push_n(outs)    # Push current outputs.
-
-        ins = fs.pull_n(batch_size)  # Fetch next inputs.
-        #if count == 487:
-        #    if fs.blnd_thr != None:
-        #       fs.blnd_thr.join()
-        #    print "BREAKING!!!!!!!!!!!!!!!!!!!!!!!!"
-        #    break
+            outs[k] = net.blobs[k].data[0,...]
+        fs.push(outs)    # Push current outputs.
         # Elapsed time.
         print 'Elapsed: {}'.format(time.time() - start)
+        ins = fs.pull()  # Fetch next inputs.
 
-    print 'Inferece time: {}'.format(time.time() - inference_start)
     # Save as file.
     for key in fs.outputs.data.iterkeys():
         fname = '{}_dataset{}_{}.h5'.format(save_prefix, idx+1, key)
         print 'Save {}...'.format(fname)
-        f = h5py.File(fname)
         output = fs.outputs.get_data(key)
-        f.create_dataset('/main', data=output)
-        f.close()
+	output.tofile(fname)        
