@@ -17,7 +17,7 @@ import config
 from DataProvider.python.forward import ForwardScanner
 
 # SET BATCH SIZE HERE
-batch_size = 5 
+batch_size = 3 
 # Initialize.
 caffe.set_device(int(sys.argv[1]))
 caffe.set_mode_gpu()
@@ -73,7 +73,9 @@ for dataset in dp.datasets:
                     net.blobs[k].reshape(*in_shape)
                     net.blobs[k].data[b,...] = v
         # Run forward pass.
+        net_start = time.time()
         net.forward()
+        print 'Net Time: {}'.format(time.time() - net_start)
         # Extract output data.
         outs = []
  
@@ -83,17 +85,9 @@ for dataset in dp.datasets:
             for b in xrange(batch_size): 
                 outs.append({k: net.blobs[k].data[b,...]})
 
-        #if count == 486:
-            #import pdb; pdb.set_trace() 
         fs.push_n(outs)    # Push current outputs.
 
         ins = fs.pull_n(batch_size)  # Fetch next inputs.
-        #if count == 487:
-        #    if fs.blnd_thr != None:
-        #       fs.blnd_thr.join()
-        #    print "BREAKING!!!!!!!!!!!!!!!!!!!!!!!!"
-        #    break
-        # Elapsed time.
         print 'Elapsed: {}'.format(time.time() - start)
 
     print 'Inferece time: {}'.format(time.time() - inference_start)
