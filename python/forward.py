@@ -16,14 +16,15 @@ import time
 import config
 from DataProvider.python.forward import ForwardScanner
 
-# SET BATCH SIZE HERE
-batch_size = 3 
 # Initialize.
 caffe.set_device(int(sys.argv[1]))
 caffe.set_mode_gpu()
 
 # Forward config.
 cfg = config.ForwardConfig(sys.argv[2])
+
+# SET BATCH SIZE HERE
+batch_size = int(sys.argv[3]) 
 
 # Create an inference net.
 net = cfg.net()
