@@ -167,8 +167,8 @@ def run(gpu, cfg_path, async, last_iter=None):
             fname = '{}_iter_{}.statistics.h5'.format(prefix, i)
             monitor.save(fname, elapsed, base_lr)
 
-    if async:
-        t.join()
+    #if async:
+    #    t.join()
 
 if __name__ == '__main__':
 
