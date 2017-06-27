@@ -63,6 +63,8 @@ for dataset in dp.datasets:
     while ins is not None:
         start = time.time()
         count += 1 
+  	if count > 5:
+	   break;
         # Set inputs.
         in_shape = None
 
@@ -90,7 +92,7 @@ for dataset in dp.datasets:
 
         ins = fs.pull_n(batch_size)  # Fetch next inputs.
         print 'Elapsed: {}'.format(time.time() - start)
-
+    time.sleep(2)
     print 'Inferece time: {}'.format(time.time() - inference_start)
     # Save as file.
     for key in fs.outputs.data.iterkeys():
