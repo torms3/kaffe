@@ -5,16 +5,17 @@ Inference.
 
 Kisuk Lee <kisuklee@mit.edu>, 2016
 """
-
 import ConfigParser
 import caffe
 import h5py
 import os
 import sys
 import time
+import copy
 
 import config
 from DataProvider.python.forward import ForwardScanner
+
 
 # Initialize.
 caffe.set_device(int(sys.argv[1]))
@@ -59,12 +60,9 @@ for dataset in dp.datasets:
     ins = fs.pull_n(batch_size)  # Fetch initial inputs.
   
     inference_start = time.time() 
-    count = 0 
     while ins is not None:
         start = time.time()
-        count += 1 
-  	if count > 5:
-	   break;
+
         # Set inputs.
         in_shape = None
 
@@ -86,7 +84,7 @@ for dataset in dp.datasets:
             # doesn't cause index out of bound, and unneeded outputs 
             # are discarded later. 
             for b in xrange(batch_size): 
-                outs.append({k: net.blobs[k].data[b,...]})
+                outs.append({k: copy.copy(net.blobs[k].data[b,...])})
 
         fs.push_n(outs)    # Push current outputs.
 
