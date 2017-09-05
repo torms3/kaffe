@@ -6,9 +6,9 @@ TrainConfig.
 Kisuk Lee <kisuklee@mit.edu>, 2016
 """
 
-import caffe
 import ConfigParser
 import os
+import pznet
 
 from DataProvider.python.data_provider import VolumeDataProvider
 
@@ -16,7 +16,6 @@ class Config(ConfigParser.ConfigParser):
     """
     Config interface.
     """
-
     def __init__(self, fname):
         """Initialize Config."""
         ConfigParser.ConfigParser.__init__(self)
@@ -30,7 +29,6 @@ class TrainConfig(Config):
     """
     TrainConfig.
     """
-
     def __init__(self, fname):
         """Initialize TrainConfig."""
         Config.__init__(self, fname)
@@ -98,7 +96,9 @@ class ForwardConfig(Config):
         """Create an inference net."""
         model   = self.get('forward','model')
         weights = self.get('forward','weights')
-        return caffe.Net(model, weights, caffe.TEST)
+        z = pznet.znet()
+        z.load_net("/home/ubuntu/import/new_unet_4cores")
+        return z 
 
     def get_data_provider(self, net_spec):
         """Create a data provider for inference."""

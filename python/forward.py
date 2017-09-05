@@ -7,7 +7,6 @@ Kisuk Lee <kisuklee@mit.edu>, 2016
 """
 
 import ConfigParser
-import caffe
 import h5py
 import os
 import sys
@@ -15,11 +14,6 @@ import time
 
 import config
 from DataProvider.python.forward import ForwardScanner
-
-# Initialize.
-caffe.set_device(int(sys.argv[1]))
-caffe.set_mode_gpu()
-
 # Forward config.
 cfg = config.ForwardConfig(sys.argv[2])
 
@@ -28,9 +22,9 @@ net = cfg.net()
 
 # Create net spec.
 net_spec = dict()
-for i in net.inputs:
-    net_spec[i] = net.blobs[i].data.shape[-3:]
-
+'''for i in net.inputs:
+    net_spec[i] = net.blobs[i].data.shape[-3:]'''
+net_spec = {'input': (18, 192, 192)}
 # Create data provider.
 dp = cfg.get_data_provider(net_spec)
 
@@ -41,8 +35,7 @@ save_prefix = cfg.get('forward','save_prefix')
 
 # Create scan spec.
 scan_spec = dict()
-for i in scan_list:
-    scan_spec[i] = net.blobs[i].data.shape[-4:]
+scan_spec = {'output': (3, 18, 192, 192)}
 
 # Forward scan.
 for dataset in dp.datasets:
@@ -57,16 +50,17 @@ for dataset in dp.datasets:
     while ins is not None:
         start = time.time()
         # Set inputs.
-        for k, v in ins.iteritems():
+        '''for k, v in ins.iteritems():
             shape = (1,) + v.shape
             net.blobs[k].reshape(*shape)
-            net.blobs[k].data[0,...] = v
+            net.blobs[k].data[0,...] = v'''
         # Run forward pass.
-        net.forward()
-        # Extract output data.
         outs = dict()
+        outs["output"] = net.forward(ins["input"])[0][...]
+        # Extract output data.
+        '''outs = dict()
         for k in scan_spec.iterkeys():
-            outs[k] = net.blobs[k].data[0,...]
+            outs[k] = net.blobs[k].data[0,...]'''
         fs.push(outs)    # Push current outputs.
         # Elapsed time.
         print 'Elapsed: {}'.format(time.time() - start)
