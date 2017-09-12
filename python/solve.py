@@ -21,10 +21,7 @@ import stats
 
 def sample_daemon(sampler, q):
     while True:
-        if not q.full():
-            q.put(sampler())
-        else:
-            q.join()
+        q.put(sampler(imgs=['input']), block=True, timeout=None)
 
 
 def run(gpu, cfg_path, async, last_iter=None):
@@ -90,7 +87,7 @@ def run(gpu, cfg_path, async, last_iter=None):
     # Asynchronous sampler.
     sampler = dp['train']
     if async:
-        q = Queue(maxsize=10)
+        q = Queue(maxsize=20)
         t = threading.Thread(target=sample_daemon, args=(sampler, q))
         t.daemon = True
         t.start()

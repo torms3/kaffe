@@ -36,7 +36,7 @@ def test_net(iter, solver, test_iter, sampler, keys, monitor=None):
     for i in range(1,test_iter+1):
 
         # Set inputs.
-        sample = sampler()
+        sample = sampler(imgs=['input'])
         for k, v in sample.iteritems():
             if k in net.blobs:
                 # Assume a sole example in minibatch (single output patch).
