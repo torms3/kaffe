@@ -12,9 +12,12 @@ import numpy as np
 from box import *
 from vector import *
 import time
+<<<<<<< HEAD
 import h5py
 from tempfile import mkdtemp
 import os.path as path
+=======
+>>>>>>> 3c7b2ff83c50452ec103971aa5ef22c2407c54ba
 
 
 class TensorData(object):
@@ -151,14 +154,8 @@ class WritableTensorData(TensorData):
         if isinstance(data_or_shape, np.ndarray):
             TensorData.__init__(self, data_or_shape, fov, offset)
         else:
-            #of = h5py.File("mytestfile.hdf5", "w")
-            #dset = of.create_dataset("main", data_or_shape, dtype='f')
-            #data = of["main"]
             filename = path.join(mkdtemp(), 'newfile.dat')
-            #ASSUMES THAT DATA OR SHAPE IS DATA
             data = np.memmap(filename, dtype='float32', mode='w+', shape=data_or_shape)
-
-            #data = np.full(data_or_shape, 0, dtype='float32')
             TensorData.__init__(self, data, fov, offset)
 
     def set_patch(self, pos, patch, op=None):
