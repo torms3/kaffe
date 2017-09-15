@@ -12,12 +12,9 @@ import numpy as np
 from box import *
 from vector import *
 import time
-<<<<<<< HEAD
 import h5py
 from tempfile import mkdtemp
 import os.path as path
-=======
->>>>>>> 3c7b2ff83c50452ec103971aa5ef22c2407c54ba
 
 
 class TensorData(object):
