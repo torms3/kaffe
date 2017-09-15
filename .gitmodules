@@ -1,3 +1,0 @@
-[submodule "data_provider"]
-	path = data_provider
-	url = https://github.com/torms3/DataProvider
