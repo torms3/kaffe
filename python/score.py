@@ -11,6 +11,7 @@ from collections import OrderedDict
 import numpy as np
 import time
 
+
 def test_net(iter, solver, test_iter, sampler, keys, monitor=None):
     """
     Run test loop.

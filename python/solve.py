@@ -19,6 +19,7 @@ import config
 import score
 import stats
 
+
 def sample_daemon(sampler, q):
     while True:
         q.put(sampler(imgs=['input']), block=True, timeout=None)
@@ -78,6 +79,12 @@ def run(gpu, cfg_path, async, last_iter=None):
 
     print 'Start training...'
     print 'Start from ', last_iter + 1
+
+    # Initial snapshot.
+    if last_iter == 0:
+        fname = '{}_iter_{}.statistics.h5'.format(prefix, 0)
+        base_lr = cfg.getfloat('solver','base_lr')
+        monitor.save(fname, 0, base_lr)
 
     # Timing.
     total_time = 0.0
