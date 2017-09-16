@@ -82,9 +82,8 @@ def run(gpu, cfg_path, async, last_iter=None):
 
     # Initial snapshot.
     if last_iter == 0:
-        fname = '{}_iter_{}.statistics.h5'.format(prefix, 0)
-        base_lr = cfg.getfloat('solver','base_lr')
-        monitor.save(fname, 0, base_lr)
+        fname = '{}_iter_{}.caffemodel'.format(prefix, 0)
+        net.save(str(fname))
 
     # Timing.
     total_time = 0.0
