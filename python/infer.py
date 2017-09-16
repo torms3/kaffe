@@ -13,6 +13,7 @@ import numpy as np
 import os
 import sys
 import time
+from utils import crop_center
 
 import config
 from DataProvider.python.forward import ForwardScanner
@@ -55,6 +56,12 @@ def run(gpu, cfg_path):
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
+    # Center-crop.
+    crop = cfg.get('forward','crop')
+    if crop is not None:
+        print "Crop %s" % crop
+        crop = eval(crop)
+
     # Forward scan.
     for dataset in dp.datasets:
         # Inference on each dataset.
@@ -91,6 +98,8 @@ def run(gpu, cfg_path):
             if os.path.exists(fname): os.remove(fname)
             f = h5py.File(fname)
             output = fs.outputs.get_data(key)
+            if crop is not None:
+                output = crop_center(output, crop)
             f.create_dataset('/main', data=output)
             f.close()
 

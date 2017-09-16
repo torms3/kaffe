@@ -1,13 +1,26 @@
 [forward]
-kaffe_root  = /path/to/kaffe/root
-dspec_path  = %(kaffe_root)s/data_spec/dataset.spec
-model       = /path/to/prototxt
-weights     = /path/to/train_iter_%(witer)s.caffemodel.h5
-wrange      = [100000,200000,300000,...]
-drange      = [0,1,2,...]
-fov         = (z,y,x)
-border      = dict(type='mirror_border', fov=%(fov)s)
-scan_params = None
-save_prefix = /path/to/save/iter_%(witer)s/prefix
-# Inference-time augmentation.
-scan_list   = {'output':dict(dst=(1,1,1))}
+dset_name   = # dataset name
+drange      = # [0,1,2,...]
+exp_path    = # /path/to/exp
+model       = # /path/to/prototxt
+wrange      = # [100000,200000,300000,...]
+
+kaffe_root  = # /path/to/kaffe/root
+dspec_path  = %(kaffe_root)s/data_spec/%(dset_name)s.spec
+weights     = # /path/to/train_iter_%(witer)s.caffemodel.h5
+
+## For "valid" architectures, no overlap-blending.
+# fov         = (z,y,x)
+# border      = dict(type='mirror_border', fov=%(fov)s)
+# scan_params = None
+
+## For "same" architectures, with overlap-blending.
+border      = None
+scan_params = dict(stride=(0.5,0.5,0.5), blend='bump')
+
+save_prefix = %(exp_path)s/forward/iter_%(witer)s/%(dset_name)s
+flip_spec   = {0:'', 7:'flip-xy', 15:'flip-xyz'}
+scan_list   = {'affinity':dict(dst=(1,1,1))}
+
+# Center-crop.
+crop        = # (z,y,x)
