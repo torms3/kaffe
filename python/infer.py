@@ -58,9 +58,8 @@ def run(gpu, cfg_path):
 
     # Center-crop.
     crop = cfg.get('forward','crop')
-    if crop is not None:
-        print "Crop %s" % crop
-        crop = eval(crop)
+    print "Crop %s" % crop
+    crop = eval(crop)
 
     # Forward scan.
     for dataset in dp.datasets:
