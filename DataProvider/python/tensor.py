@@ -14,7 +14,7 @@ from vector import *
 import time
 import h5py
 from tempfile import mkdtemp
-import os.path as path
+import os
 
 
 class TensorData(object):
@@ -144,14 +144,18 @@ class WritableTensorData(TensorData):
     Writable tensor data.
     """
 
-    def __init__(self, data_or_shape, fov=(0,0,0), offset=(0,0,0)):
+    def __init__(self, data_or_shape, fov=(0,0,0), offset=(0,0,0), name="data"):
         """
         Initialize a writable tensor data, or create a new tensor of zeros.
         """
         if isinstance(data_or_shape, np.ndarray):
             TensorData.__init__(self, data_or_shape, fov, offset)
         else:
-            filename = path.join(mkdtemp(), 'newfile.dat')
+            dir_name = '/tmp/{}'.format(os.getpid())
+            if not os.path.exists(dir_name):
+                os.makedirs(dir_name)
+            filename = os.path.join(dir_name, '{}.dat'.format(name))
+
             data = np.memmap(filename, dtype='float32', mode='w+', shape=data_or_shape)
             TensorData.__init__(self, data, fov, offset)
 
@@ -189,7 +193,10 @@ class WritableTensorDataWithMask(WritableTensorData):
         WritableTensorData.__init__(self, data_or_shape, fov, offset)
 
         # Set norm.
-        self._norm = WritableTensorData(self.dim(), fov, offset)
+        self._norm = WritableTensorData(data_or_shape[1:], fov, offset, name="norm")
+
+    def flush_to_disk(self):
+        self._data.flush()
 
     def set_patch(self, pos, patch, op='np.add', mask=None):
         """

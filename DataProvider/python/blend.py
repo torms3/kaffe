@@ -86,6 +86,7 @@ class BumpBlend(Blend):
         Blend.__init__(self, spec, locs, blend)
 
         self.logit_maps = dict()
+        self.push_count = 0
 
         # Inference with overlapping window.
         self.max_logits = None
@@ -104,8 +105,12 @@ class BumpBlend(Blend):
 
     def push(self, loc, sample):
         """Blend with data."""
+        self.push_count += 1
+
         for k, v in sample.iteritems():
             assert k in self.data
+            if self.push_count % 100 == 1:
+                self.data[k].flush_to_disk()
             t0 = time.time()
             mask = self._get_mask(k, loc)
             t1 = time.time() - t0

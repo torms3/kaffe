@@ -6,6 +6,7 @@ Inference.
 Kisuk Lee <kisuklee@mit.edu>, 2016
 """
 
+import shutil
 import ConfigParser
 import h5py
 import os
@@ -49,18 +50,10 @@ for dataset in dp.datasets:
     ins = fs.pull()  # Fetch initial inputs.
     while ins is not None:
         start = time.time()
-        # Set inputs.
-        '''for k, v in ins.iteritems():
-            shape = (1,) + v.shape
-            net.blobs[k].reshape(*shape)
-            net.blobs[k].data[0,...] = v'''
         # Run forward pass.
         outs = dict()
         outs["output"] = net.forward(ins["input"])[0][...]
         # Extract output data.
-        '''outs = dict()
-        for k in scan_spec.iterkeys():
-            outs[k] = net.blobs[k].data[0,...]'''
         fs.push(outs)    # Push current outputs.
         # Elapsed time.
         print 'Elapsed: {}'.format(time.time() - start)
@@ -74,3 +67,5 @@ for dataset in dp.datasets:
         output = fs.outputs.get_data(key)
         f.create_dataset('/main', data=output)
         f.close()
+        shutil.rmtree('/tmp/{}'.format(os.get_pid()))
+
