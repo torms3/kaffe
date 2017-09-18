@@ -109,7 +109,7 @@ class BumpBlend(Blend):
 
         for k, v in sample.iteritems():
             assert k in self.data
-            if self.push_count % 100 == 1:
+            if self.push_count % 500 == 1:
                 self.data[k].flush_to_disk()
             t0 = time.time()
             mask = self._get_mask(k, loc)

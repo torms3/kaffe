@@ -15,8 +15,9 @@ import time
 
 import config
 from DataProvider.python.forward import ForwardScanner
+
 # Forward config.
-cfg = config.ForwardConfig(sys.argv[2])
+cfg = config.ForwardConfig(sys.argv[1])
 
 # Create an inference net.
 net = cfg.net()
