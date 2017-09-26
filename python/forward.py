@@ -41,6 +41,7 @@ scan_spec = {'output': (3, 18, 192, 192)}
 
 # Forward scan.
 for dataset in dp.datasets:
+    
     idx = dataset.params['dataset_id']
     print 'Forward scan dataset {}'.format(idx)
 
@@ -67,6 +68,13 @@ for dataset in dp.datasets:
         f = h5py.File(fname)
         output = fs.outputs.get_data(key)
         f.create_dataset('/main', data=output)
-        f.close()
-        shutil.rmtree('/tmp/{}'.format(os.get_pid()))
+		  f.close()
+
+        try:
+           print ("Deleting temp folder...")
+		     shutil.rmtree('/tmp/{}'.format(os.getpid())); sys.exit()
+	     except:
+			  print ("Couldn't remove the temp folder.")
+		  else:
+		     print ("Temp folder deleted.")
 
