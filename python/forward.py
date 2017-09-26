@@ -68,13 +68,13 @@ for dataset in dp.datasets:
         f = h5py.File(fname)
         output = fs.outputs.get_data(key)
         f.create_dataset('/main', data=output)
-		  f.close()
+        f.close()
 
         try:
            print ("Deleting temp folder...")
-		     shutil.rmtree('/tmp/{}'.format(os.getpid())); sys.exit()
-	     except:
-			  print ("Couldn't remove the temp folder.")
-		  else:
-		     print ("Temp folder deleted.")
+           shutil.rmtree('/tmp/{}'.format(os.getpid())); sys.exit()
+	except:
+	   print ("Couldn't remove the temp folder.")
+        else:
+	   print ("Temp folder deleted.")
 
