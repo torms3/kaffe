@@ -97,7 +97,7 @@ class ForwardConfig(Config):
         model   = self.get('forward','model')
         weights = self.get('forward','weights')
         z = pznet.znet()
-        z.load_net("/opt/znets/new_unet_2cores")
+        z.load_net("/opt/znets/production_unet")
         return z 
 
     def get_data_provider(self, net_spec):
