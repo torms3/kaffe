@@ -47,7 +47,6 @@ for dataset in dp.datasets:
     print 'Forward scan dataset {}'.format(idx)
 
     # Create ForwardScanner for the current dataset.
-    import pdb; pdb.set_trace() 
     fs = ForwardScanner(dataset, scan_spec, params=scan_params)
 
     # Scan loop.
