@@ -12,6 +12,7 @@ import h5py
 import os
 import sys
 import time
+import numpy as np
 
 import config
 from DataProvider.python.forward import ForwardScanner
@@ -56,6 +57,9 @@ for dataset in dp.datasets:
         # Run forward pass.
         outs = dict()
         outs["output"] = net.forward(ins["input"])[0][...]
+        if np.isnan(np.sum(outs["output"])):
+		print "Nan busted!"
+		import pdb; pdb.set_trace()
         # Extract output data.
         fs.push(outs)    # Push current outputs.
         # Elapsed time.
@@ -70,10 +74,9 @@ for dataset in dp.datasets:
         output = fs.outputs.get_data(key)
         f.create_dataset('/main', data=output)
         f.close()
-
         try:
            print ("Deleting temp folder...")
-           shutil.rmtree('/tmp/{}'.format(os.getpid())); sys.exit()
+           shutil.rmtree('/tmp/{}'.format(os.getpid())); 
 	except:
 	   print ("Couldn't remove the temp folder.")
         else:
