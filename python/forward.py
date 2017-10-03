@@ -37,7 +37,8 @@ save_prefix = cfg.get('forward','save_prefix')
 
 # Create scan spec.
 scan_spec = dict()
-scan_spec = {'output': (3, 18, 192, 192)}
+#THIS NEEDS TO BE CHANGED FOR EVERY NET UGLY HACK BOHAHA
+scan_spec = {'output': (3, 14, 180, 180)}
 
 # Forward scan.
 for dataset in dp.datasets:
@@ -46,6 +47,7 @@ for dataset in dp.datasets:
     print 'Forward scan dataset {}'.format(idx)
 
     # Create ForwardScanner for the current dataset.
+    import pdb; pdb.set_trace() 
     fs = ForwardScanner(dataset, scan_spec, params=scan_params)
 
     # Scan loop.
