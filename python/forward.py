@@ -27,7 +27,7 @@ net = cfg.net()
 net_spec = dict()
 '''for i in net.inputs:
     net_spec[i] = net.blobs[i].data.shape[-3:]'''
-net_spec = {'input': (18, 192, 192)}
+net_spec = {'input': (18, 256, 256)}
 # Create data provider.
 dp = cfg.get_data_provider(net_spec)
 
@@ -39,7 +39,7 @@ save_prefix = cfg.get('forward','save_prefix')
 # Create scan spec.
 scan_spec = dict()
 #THIS NEEDS TO BE CHANGED FOR EVERY NET UGLY HACK BOHAHA
-scan_spec = {'output': (3, 14, 180, 180)}
+scan_spec = {'output': (3, 14, 244, 244)}
 
 # Forward scan.
 for dataset in dp.datasets:
@@ -68,12 +68,14 @@ for dataset in dp.datasets:
 
     # Save as file.
     for key in fs.outputs.data.iterkeys():
+        start = time.time()
         fname = '{}_dataset{}_{}.h5'.format(save_prefix, idx+1, key)
         print 'Save {}...'.format(fname)
         f = h5py.File(fname)
         output = fs.outputs.get_data(key)
         f.create_dataset('/main', data=output)
         f.close()
+        print 'File Saving: {}'.format(time.time() - start)
         try:
            print ("Deleting temp folder...")
            shutil.rmtree('/tmp/{}'.format(os.getpid())); 
