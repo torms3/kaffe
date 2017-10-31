@@ -21,7 +21,7 @@ from DataProvider.python.forward import ForwardScanner
 cfg = config.ForwardConfig(sys.argv[1])
 
 # Create an inference net.
-znet_path = "/opt/znets/p288_crop"
+znet_path = "/opt/znets/p288_crop_2cores"
 net = cfg.net(znet_path)
 
 # Create net spec.
