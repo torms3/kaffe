@@ -21,13 +21,14 @@ from DataProvider.python.forward import ForwardScanner
 cfg = config.ForwardConfig(sys.argv[1])
 
 # Create an inference net.
-net = cfg.net()
+znet_path = "/opt/znets/p288_crop"
+net = cfg.net(znet_path)
 
 # Create net spec.
 net_spec = dict()
 '''for i in net.inputs:
     net_spec[i] = net.blobs[i].data.shape[-3:]'''
-net_spec = {'input': (18, 256, 256)}
+net_spec = {'input': (18, 288, 288)}
 # Create data provider.
 dp = cfg.get_data_provider(net_spec)
 
@@ -39,7 +40,7 @@ save_prefix = cfg.get('forward','save_prefix')
 # Create scan spec.
 scan_spec = dict()
 #THIS NEEDS TO BE CHANGED FOR EVERY NET UGLY HACK BOHAHA
-scan_spec = {'output': (3, 14, 244, 244)}
+scan_spec = {'output': (3, 14, 264, 264)}
 
 # Forward scan.
 for dataset in dp.datasets:
