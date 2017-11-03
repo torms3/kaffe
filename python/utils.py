@@ -3,7 +3,7 @@ __doc__ = """
 
 Utility functions.
 
-Kisuk Lee <kisuklee@mit.edu>, 2016
+Kisuk Lee <kisuklee@mit.edu>, 2017
 """
 
 def crop_center(img, shape):

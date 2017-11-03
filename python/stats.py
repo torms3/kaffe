@@ -6,6 +6,7 @@ Managing training statistics.
 Jingpeng Wu <jingpeng.wu@gmail.com>,
 Kisuk Lee <kisuklee@mit.edu>, 2015-2016
 """
+
 import numpy as np
 import h5py
 import os
