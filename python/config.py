@@ -95,11 +95,11 @@ class ForwardConfig(Config):
         """Initialize ForwardConfig."""
         Config.__init__(self, fname)
 
-    def net(self):
+    def net(self, phase=caffe.TEST):
         """Create an inference net."""
         model   = self.get('forward','model')
         weights = self.get('forward','weights')
-        return caffe.Net(model, weights, caffe.TEST)
+        return caffe.Net(model, weights, phase)
 
     def get_data_provider(self, net_spec):
         """Create a data provider for inference."""
