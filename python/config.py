@@ -92,12 +92,11 @@ class ForwardConfig(Config):
         """Initialize ForwardConfig."""
         Config.__init__(self, fname)
 
-    def net(self, net_path):
+    def net(self):
         """Create an inference net."""
         model   = self.get('forward','model')
-        weights = self.get('forward','weights')
         z = pznet.znet()
-        z.load_net(net_path)
+        z.load_net(model)
         return z 
 
     def get_data_provider(self, net_spec):
